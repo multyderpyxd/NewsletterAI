@@ -23,7 +23,7 @@ load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 from news.rss_fetcher           import fetch_rss_articles
 from news.lastfm_fetcher        import fetch_recent_releases, fetch_similar_artists
 from news.spotify_fetcher       import fetch_new_releases, fetch_related_artists
-from news.zaragoza_fetcher      import fetch_zaragoza_venue_agenda
+from news.zaragoza_fetcher      import fetch_zaragoza_venue_agenda, enrich_with_genres
 from news.ticketmaster_fetcher  import fetch_ticketmaster_concerts
 
 
@@ -213,6 +213,17 @@ def _build_prompt(
         for i, a in enumerate(rss_articles[:30])
     ) or "  (sin datos)"
 
+    # Separar agenda Zaragoza en conocidos vs desconocidos antes de enviarlo a la IA
+    excluded = followed_artists | recently_recommended
+    zaragoza_known   = [
+        e for e in zaragoza_agenda
+        if e.get("artist", "").lower().strip() in excluded
+    ]
+    zaragoza_unknown = enrich_with_genres([
+        e for e in zaragoza_agenda
+        if e.get("artist", "").lower().strip() not in excluded
+    ])
+
     return f"""
 Fecha de hoy: {today_str}
 
@@ -234,8 +245,11 @@ Lista COMPLETA de artistas excluidos de discoveries (conocidos/seguidos + recome
 [B] NOTICIAS RSS (pueden mencionar giras, tours o lanzamientos próximos):
 {rss_text}
 
-[C] AGENDA DE SALAS DE ZARAGOZA (scraping directo de webs de salas):
-{_fmt(zaragoza_agenda, ["artist", "event", "date", "venue", "url", "source"], 30)}
+[C1] AGENDA ZARAGOZA — ARTISTAS QUE EL USUARIO YA SIGUE (incluir TODOS en local_candidates):
+{_fmt(zaragoza_known, ["artist", "event", "date", "venue", "url", "source"], 20) if zaragoza_known else "  (ninguno esta semana)"}
+
+[C2] AGENDA ZARAGOZA — ARTISTAS DESCONOCIDOS (seleccionar los más relevantes por género):
+{_fmt(zaragoza_unknown, ["artist", "event", "date", "venue", "genre", "url", "source"], 30)}
 
 [D] LANZAMIENTOS RECIENTES (Last.fm — ya filtrados a últimos 12 meses):
 {_fmt(lastfm_releases, ["artist", "album", "release_date", "url"], 60)}
@@ -320,10 +334,11 @@ Reglas ESTRICTAS:
   coincide exactamente con cualquier entrada de la lista, DESCÁRTALO. No uses criterio
   de "es muy conocido" — usa solo la lista proporcionada.
 
-- local_candidates: máximo 6. Incluye eventos de [C] relevantes: tanto artistas
-  conocidos/seguidos (independientemente del género) como desconocidos que encajen
-  con los géneros del usuario. El orden final lo gestiona el sistema, no es necesario
-  que los ordenes tú.
+- local_candidates: máximo 6.
+    1. Incluye TODOS los eventos de [C1] sin excepción (son artistas que el usuario
+       sigue — tienen prioridad absoluta independientemente del género).
+    2. Completa hasta 6 con eventos de [C2] que encajen con los géneros del usuario.
+  El orden final lo gestiona el sistema externamente, no es necesario que los ordenes.
 
 - Todo el texto explicativo en español.
 - Si no hay datos para un bloque, devuelve [].

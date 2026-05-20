@@ -589,6 +589,48 @@ def _dedupe(events: list[dict]) -> list[dict]:
 
     return result
 
+# ─── Enriquecimiento de género (páginas individuales Union25) ────────────────
+
+def _extract_union25_genre(soup: BeautifulSoup) -> str:
+    """
+    En Union25, el género específico del artista aparece en headings como:
+      "Candelabro (Indie Rock / Art Rock / Post-Rock)"
+    Extrae el contenido entre paréntesis si contiene al menos una "/".
+    """
+    for tag in soup.find_all(["h1", "h2", "h3", "h4"]):
+        text = _clean(tag.get_text(" "))
+        m = re.search(r"\(([^)]+/[^)]+)\)", text)
+        if m:
+            return m.group(1).strip()
+    return ""
+
+
+def enrich_with_genres(events: list[dict], max_requests: int = 20) -> list[dict]:
+    """
+    Para eventos de Union25, visita la página individual de cada evento
+    y extrae el género específico del artista.
+    Limita a max_requests peticiones para controlar la latencia.
+    """
+    enriched = []
+    count    = 0
+
+    for e in events:
+        url = e.get("url", "")
+        if count < max_requests and "union25.org/concierto/" in url:
+            soup = _get(url)
+            if soup:
+                genre = _extract_union25_genre(soup)
+                if genre:
+                    e = {**e, "genre": genre}
+            count += 1
+            time.sleep(REQUEST_DELAY)
+        enriched.append(e)
+
+    if count:
+        print(f"  Zaragoza → género enriquecido en {count} eventos Union25")
+    return enriched
+
+
 # ─── Paginación Union25 ───────────────────────────────────────────────────────
 
 def _fetch_union25_all_pages(base_url: str, venue: str) -> list[dict]:
