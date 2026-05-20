@@ -286,7 +286,7 @@ def call_ai(prompt: str) -> dict:
             {"role": "user",   "content": prompt},
         ],
         temperature=0.2,
-        max_tokens=3000,
+        max_tokens=5000,
     )
 
     raw    = response.choices[0].message.content or ""
