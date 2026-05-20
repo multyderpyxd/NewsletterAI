@@ -107,12 +107,13 @@ def _tag(text: str, color: str) -> str:
       border: 1px solid {color}33;">{_e(text)}</span>"""
 
 
-def _card_open(accent: str) -> str:
+def _card_open(accent: str, bg: str | None = None) -> str:
+    background = bg or COLORS["surface"]
     return f"""
 <tr>
   <td style="padding: 0 0 12px 0;">
     <table width="100%" cellpadding="0" cellspacing="0" style="
-      background: {COLORS['surface']}; border-radius: 6px;
+      background: {background}; border-radius: 6px;
       border-left: 3px solid {accent}; overflow: hidden;">
       <tr><td style="padding: 20px 24px;">
 """
@@ -254,13 +255,16 @@ def _render_local_candidates(local_candidates: list[dict]) -> str:
     rows  = _section_header("📍", "Candidatos Locales en Zaragoza", color, len(local_candidates))
 
     for item in local_candidates:
-        date = item.get("date","") or item.get("dates","")
-        rows += _card_open(color)
+        date     = item.get("date","") or item.get("dates","")
+        is_known = item.get("is_known", False)
+        bg       = "#2b1a1a" if is_known else None  # fondo coral tenue para artistas seguidos
+        rows += _card_open(color, bg=bg)
         rows += f"""
 <div style="margin-bottom: 8px;">
   {_tag("📍 Zaragoza", color)}
   {_tag(item.get("venue",""), COLORS['text_muted'])}
   {_tag(item.get("source",""), COLORS['text_muted'])}
+  {_tag("✓ Artista que sigues", color) if is_known else ""}
 </div>
 <div style="font-family: Georgia, serif; font-size: 18px; font-weight: bold;
   color: {COLORS['text']}; margin-bottom: 4px;">{_e(item.get("artist",""))}</div>

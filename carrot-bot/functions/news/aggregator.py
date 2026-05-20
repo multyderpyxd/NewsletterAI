@@ -162,12 +162,12 @@ def _normalize(result: dict) -> dict:
 def _sort_local_candidates(candidates: list[dict], followed: set[str]) -> list[dict]:
     """
     Reordena local_candidates en código (no dependemos de la IA para esto):
-      1. Artistas que el usuario sigue/conoce → primero
+      1. Artistas que el usuario sigue/conoce → primero, marcados con is_known=True
       2. Artistas desconocidos → después
     Dentro de cada grupo mantiene el orden de fecha que dio la IA.
     """
-    known   = [c for c in candidates if c.get("artist", "").lower().strip() in followed]
-    unknown = [c for c in candidates if c.get("artist", "").lower().strip() not in followed]
+    known   = [{**c, "is_known": True}  for c in candidates if c.get("artist", "").lower().strip() in followed]
+    unknown = [{**c, "is_known": False} for c in candidates if c.get("artist", "").lower().strip() not in followed]
     return known + unknown
 
 
