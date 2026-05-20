@@ -10,14 +10,24 @@ import feedparser
 # ─── Feeds RSS ────────────────────────────────────────────────────────────────
 
 RSS_FEEDS = [
+    # ── Rock / metal / alternativo (mainstream) ───────────────────────────────
     "https://pitchfork.com/rss/news/",
     "https://www.nme.com/news/music/feed",
     "https://www.stereogum.com/feed/",
     "https://www.rollingstone.com/music/music-news/feed/",
     "https://consequence.net/feed/",
-    "https://loudwire.com/feed/",          # bueno para metal/rock alternativo
-    "https://www.kerrang.com/feed",        # rock, metal, alternativo
-    "https://www.altpress.com/feed/",      # post-hardcore, metalcore, alternativo
+    "https://loudwire.com/feed/",
+    "https://www.kerrang.com/feed",
+    "https://www.altpress.com/feed/",
+    # ── Metalcore / post-hardcore (nicho) ────────────────────────────────────
+    "https://www.heavyblogisheavy.com/feed/",  # prog, math metal, metalcore
+    "https://www.theprp.com/feed/",            # post-hardcore, metalcore
+    # ── Electrónica / experimental ────────────────────────────────────────────
+    "https://www.factmag.com/feed/",           # electrónica, experimental, avant-garde
+    # ── Música japonesa / anime / videojuegos ────────────────────────────────
+    "https://www.animenewsnetwork.com/all/rss.xml?ann-edition=us",  # anime/OST
+    "https://www.siliconera.com/feed/",        # videojuegos japoneses, OST
+    "https://www.gematsu.com/feed",            # noticias videojuegos japoneses
 ]
 
 MAX_ARTICLES_PER_FEED = 10
