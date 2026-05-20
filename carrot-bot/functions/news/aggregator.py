@@ -13,6 +13,7 @@ los datos y devuelva un JSON estructurado con cuatro bloques:
 import json
 import os
 import re
+from datetime import datetime, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -139,7 +140,9 @@ def _build_prompt(
     related_artists:   list[dict],
 ) -> str:
 
-    all_known = sorted(followed_artists)
+    today_str  = datetime.now().strftime("%Y-%m-%d")
+    cutoff_str = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
+    all_known  = sorted(followed_artists)
 
     rss_text = "\n".join(
         f"  [{i+1}] {a.get('source','')} — {a.get('title','')}\n"
@@ -149,12 +152,14 @@ def _build_prompt(
     ) or "  (sin datos)"
 
     return f"""
+Fecha de hoy: {today_str}
+
 Perfil del usuario:
   Artistas favoritos: {", ".join(artists)}
   Géneros favoritos:  {", ".join(genres)}
   Ciudad: Zaragoza, España
 
-Lista COMPLETA de artistas que el usuario ya conoce/sigue (NO incluir en discoveries):
+Lista COMPLETA de artistas que el usuario ya conoce/sigue:
   {", ".join(all_known[:200])}
 
 {PROXIMITY_CONTEXT}
@@ -164,16 +169,16 @@ Lista COMPLETA de artistas que el usuario ya conoce/sigue (NO incluir en discove
 [A] CONCIERTOS REALES EN EUROPA (Ticketmaster — datos 100% fiables):
 {_fmt(ticketmaster, ["artist", "event", "dates", "locations", "venue", "proximity", "price", "url"], 60)}
 
-[B] NOTICIAS RSS (pueden mencionar giras o lanzamientos):
+[B] NOTICIAS RSS (pueden mencionar giras, tours o lanzamientos próximos):
 {rss_text}
 
 [C] AGENDA DE SALAS DE ZARAGOZA (scraping directo de webs de salas):
 {_fmt(zaragoza_agenda, ["artist", "event", "date", "venue", "url", "source"], 30)}
 
-[D] LANZAMIENTOS RECIENTES (Last.fm):
-{_fmt(lastfm_releases, ["artist", "album", "url"], 60)}
+[D] LANZAMIENTOS RECIENTES (Last.fm — ya filtrados a últimos 12 meses):
+{_fmt(lastfm_releases, ["artist", "album", "release_date", "url"], 60)}
 
-[E] LANZAMIENTOS RECIENTES (Spotify):
+[E] LANZAMIENTOS RECIENTES (Spotify — ya filtrados a últimos 6 meses o futuros):
 {_fmt(spotify_releases, ["artist", "album", "type", "release_date", "url"], 60)}
 
 [F] ARTISTAS SIMILARES (Last.fm):
@@ -197,8 +202,8 @@ Devuelve este JSON exacto y nada más:
       "proximity": 1,
       "price":     "rango de precios si se conoce",
       "summary":   "1-2 frases en español sobre el evento",
-      "url":       "enlace real de Ticketmaster",
-      "source":    "Ticketmaster"
+      "url":       "enlace real",
+      "source":    "Ticketmaster|sala"
     }}
   ],
   "releases": [
@@ -236,13 +241,29 @@ Devuelve este JSON exacto y nada más:
 
 Reglas ESTRICTAS:
 - Devuelve SOLO el JSON. Sin texto antes ni después.
-- concerts: máximo 8. USA SOLO datos de [A]. Ordena por proximity (0 primero).
-  No inventes fechas, venues ni URLs — cópialos exactamente de [A].
-- releases: máximo 6. Usa [D] y [E]. Prioriza artistas favoritos. No inventes.
-- discoveries: exactamente 4 si hay datos. NUNCA artistas de la lista "ya conoce/sigue".
+
+- concerts: máximo 12. Dos fuentes permitidas:
+    1. Datos de [A] (Ticketmaster): copia exactamente artist, event, dates, locations,
+       venue, proximity, price y url — no inventes ni modifiques nada.
+    2. Datos de [C] (salas de Zaragoza) SOLO si el artista del evento está en la lista
+       de artistas conocidos/seguidos del usuario. En ese caso usa proximity=0 y
+       como source el nombre de la sala.
+  Ordena por proximity (0 primero). Para cada artista favorito que tenga datos en [A],
+  incluye al menos su concierto europeo más próximo aunque sea nivel 3 o 4.
+
+- releases: máximo 6. USA SOLO datos de [D], [E] o [B] con release_date posterior a
+  {cutoff_str} o futura (upcoming). Si un lanzamiento no tiene fecha confirmada o
+  su fecha es anterior a {cutoff_str}, NO lo incluyas. Prioriza artistas favoritos.
+  También incluye lanzamientos próximos anunciados en [B] aunque aún no hayan salido.
+  No inventes fechas ni URLs.
+
+- discoveries: exactamente 4 si hay datos. NUNCA artistas de la lista de conocidos.
   Usa solo artistas de [F] o [G] que no estén en esa lista.
-- local_candidates: máximo 5. Usa solo eventos reales de [C] que encajen con
-  géneros del usuario. NO repetir lo que ya esté en concerts.
+
+- local_candidates: máximo 5. Usa SOLO eventos de [C] donde el artista NO esté en la
+  lista de conocidos/seguidos (artistas desconocidos que encajen con géneros del usuario).
+  NO repetir artistas ya incluidos en concerts.
+
 - Todo el texto explicativo en español.
 - Si no hay datos para un bloque, devuelve [].
 """

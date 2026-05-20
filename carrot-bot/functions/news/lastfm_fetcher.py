@@ -7,13 +7,16 @@ Consulta Last.fm para:
 """
 
 import os
+import re
 import time
 import requests
+from datetime import datetime, timedelta
 
-LASTFM_API_URL = "https://ws.audioscrobbler.com/2.0/"
-REQUEST_DELAY  = 0.25   # segundos entre llamadas (rate limit)
-SIMILAR_LIMIT  = 3      # artistas similares por artista
-SIMILAR_MIN_MATCH = 0.4  # similitud mínima (0-1)
+LASTFM_API_URL    = "https://ws.audioscrobbler.com/2.0/"
+REQUEST_DELAY     = 0.25   # segundos entre llamadas (rate limit)
+SIMILAR_LIMIT     = 3      # artistas similares por artista
+SIMILAR_MIN_MATCH = 0.4    # similitud mínima (0-1)
+RECENT_MONTHS     = 12     # solo álbumes publicados en los últimos N meses
 
 
 def _get(params: dict) -> dict:
@@ -33,34 +36,79 @@ def _get(params: dict) -> dict:
         return {}
 
 
+# ─── Fecha de lanzamiento de álbum ───────────────────────────────────────────
+
+def _parse_lastfm_date(datestr: str) -> datetime | None:
+    """Parsea el campo 'releasedate' de Last.fm: ' 23 Nov 2024, 00:00 '"""
+    if not datestr:
+        return None
+    datestr = datestr.strip()
+    m = re.match(r"(\d{1,2})\s+(\w+)\s+(\d{4})", datestr)
+    if m:
+        try:
+            return datetime.strptime(f"{m.group(1)} {m.group(2)} {m.group(3)}", "%d %b %Y")
+        except ValueError:
+            pass
+    m = re.match(r"^(\d{4})", datestr)
+    if m:
+        try:
+            return datetime(int(m.group(1)), 1, 1)
+        except ValueError:
+            pass
+    return None
+
+
+def _get_album_releasedate(artist: str, album: str) -> datetime | None:
+    """Consulta album.getInfo para obtener la fecha de lanzamiento."""
+    data = _get({"method": "album.getInfo", "artist": artist, "album": album, "autocorrect": 1})
+    datestr = data.get("album", {}).get("releasedate", "")
+    return _parse_lastfm_date(datestr)
+
+
 # ─── Lanzamientos recientes ───────────────────────────────────────────────────
 
 def fetch_recent_releases(artists: list[str]) -> list[dict]:
     """
-    Busca los álbumes más recientes de cada artista en Last.fm.
-    Útil para detectar lanzamientos de bandas pequeñas que no salen en RSS.
+    Busca álbumes de los artistas que tengan menos de RECENT_MONTHS meses de antigüedad.
+    Usa artist.getTopAlbums para obtener candidatos y album.getInfo para verificar la fecha.
     """
     releases = []
+    cutoff   = datetime.now() - timedelta(days=30 * RECENT_MONTHS)
 
-    for artist in artists:
-        data  = _get({"method": "artist.getTopAlbums", "artist": artist, "limit": 3})
+    # Limitamos a los primeros 25 artistas para no disparar el rate limit
+    for artist in artists[:25]:
+        data   = _get({"method": "artist.getTopAlbums", "artist": artist, "limit": 5})
         albums = data.get("topalbums", {}).get("album", [])
+        time.sleep(REQUEST_DELAY)
 
-        for album in albums[:2]:
+        added = 0
+        for album in albums[:5]:
+            if added >= 2:
+                break
+
             name = album.get("name", "").strip()
             url  = album.get("url",  "").strip()
 
-            if name and name.lower() not in {"(null)", ""}:
-                releases.append({
-                    "artist": artist,
-                    "album":  name,
-                    "url":    url,
-                    "source": "Last.fm",
-                })
+            if not name or name.lower() in {"(null)", ""}:
+                continue
 
-        time.sleep(REQUEST_DELAY)
+            release_dt = _get_album_releasedate(artist, name)
+            time.sleep(REQUEST_DELAY)
 
-    print(f"  Last.fm → {len(releases)} álbumes encontrados")
+            # Incluir solo álbumes recientes (o futuros: pre-anuncios)
+            if release_dt is None or release_dt < cutoff:
+                continue
+
+            releases.append({
+                "artist":       artist,
+                "album":        name,
+                "url":          url,
+                "source":       "Last.fm",
+                "release_date": release_dt.strftime("%Y-%m-%d"),
+            })
+            added += 1
+
+    print(f"  Last.fm → {len(releases)} lanzamientos recientes encontrados")
     return releases
 
 

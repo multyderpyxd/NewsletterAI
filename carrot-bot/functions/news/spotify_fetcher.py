@@ -15,6 +15,7 @@ vs el sistema anterior: ~3 por artista = reducción del 60%+
 import os
 import time
 import re
+from datetime import datetime, timedelta
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
@@ -24,8 +25,26 @@ from pathlib import Path
 
 load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 
-REQUEST_DELAY  = 0.5   # segundos entre llamadas individuales
-BATCH_SIZE     = 50    # máximo de IDs por llamada batch de Spotify
+REQUEST_DELAY        = 0.5   # segundos entre llamadas individuales
+BATCH_SIZE           = 50    # máximo de IDs por llamada batch de Spotify
+RELEASE_MONTHS_WINDOW = 6   # filtrar lanzamientos más antiguos que N meses
+
+
+def _is_recent_or_upcoming(release_date: str) -> bool:
+    """True si el lanzamiento es de los últimos RELEASE_MONTHS_WINDOW meses o es futuro."""
+    if not release_date:
+        return False
+    try:
+        if len(release_date) == 4:
+            dt = datetime(int(release_date), 1, 1)
+        elif len(release_date) == 7:
+            dt = datetime(int(release_date[:4]), int(release_date[5:7]), 1)
+        else:
+            dt = datetime.strptime(release_date[:10], "%Y-%m-%d")
+        cutoff = datetime.now() - timedelta(days=30 * RELEASE_MONTHS_WINDOW)
+        return dt >= cutoff
+    except (ValueError, TypeError):
+        return False
 
 
 # ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -125,18 +144,25 @@ def fetch_new_releases(artists: list[str]) -> list[dict]:
             albums = sp.artist_albums(
                 artist_id,
                 album_type="album,single",
-                limit=3,
+                limit=5,
             )
 
-            for album in albums.get("items", [])[:2]:
+            added = 0
+            for album in albums.get("items", []):
+                if added >= 2:
+                    break
+                release_date = album.get("release_date", "")
+                if not _is_recent_or_upcoming(release_date):
+                    continue
                 releases.append({
                     "artist":       artist_name,
                     "album":        album.get("name", ""),
                     "type":         album.get("album_type", ""),
-                    "release_date": album.get("release_date", ""),
+                    "release_date": release_date,
                     "url":          album.get("external_urls", {}).get("spotify", ""),
                     "source":       "Spotify",
                 })
+                added += 1
 
         except Exception as e:
             if _is_spotify_rate_limit(e):
