@@ -289,7 +289,15 @@ def call_ai(prompt: str) -> dict:
         max_tokens=5000,
     )
 
-    raw    = response.choices[0].message.content or ""
+    choice        = response.choices[0]
+    finish_reason = choice.finish_reason
+    raw           = choice.message.content or ""
+
+    if finish_reason == "length":
+        used = response.usage.completion_tokens if response.usage else "?"
+        print(f"  ⚠️  Respuesta cortada por max_tokens (completion_tokens={used}). "
+              f"Aumenta max_tokens en call_ai().")
+
     result = _safe_json(raw)
     return _normalize(result)
 
