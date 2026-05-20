@@ -242,13 +242,15 @@ Devuelve este JSON exacto y nada más:
 Reglas ESTRICTAS:
 - Devuelve SOLO el JSON. Sin texto antes ni después.
 
-- concerts: máximo 12. Dos fuentes permitidas:
+- concerts: máximo 12. DOS fuentes, mutuamente excluyentes con local_candidates:
     1. Datos de [A] (Ticketmaster): copia exactamente artist, event, dates, locations,
        venue, proximity, price y url — no inventes ni modifiques nada.
-    2. Datos de [C] (salas de Zaragoza) SOLO si el artista del evento está en la lista
-       de artistas conocidos/seguidos del usuario. En ese caso usa proximity=0 y
-       como source el nombre de la sala.
-  Ordena por proximity (0 primero). Para cada artista favorito que tenga datos en [A],
+    2. Datos de [C] (salas de Zaragoza) ÚNICAMENTE si el nombre del artista aparece
+       de forma LITERAL (ignorando mayúsculas) en la lista de conocidos/seguidos.
+       Si hay la mínima duda, NO lo incluyas aquí. Usa proximity=0 y como source
+       el nombre de la sala.
+  Un artista de [C] puede estar en concerts O en local_candidates, NUNCA en ambos.
+  Ordena por proximity (0 primero). Para cada artista favorito con datos en [A],
   incluye al menos su concierto europeo más próximo aunque sea nivel 3 o 4.
 
 - releases: máximo 6. USA SOLO datos de [D], [E] o [B] con release_date posterior a
@@ -257,12 +259,14 @@ Reglas ESTRICTAS:
   También incluye lanzamientos próximos anunciados en [B] aunque aún no hayan salido.
   No inventes fechas ni URLs.
 
-- discoveries: exactamente 4 si hay datos. NUNCA artistas de la lista de conocidos.
-  Usa solo artistas de [F] o [G] que no estén en esa lista.
+- discoveries: exactamente 4 si hay datos. Compara el nombre de cada candidato de [F]
+  y [G] con la lista de conocidos de forma LITERAL e ignorando mayúsculas. Si el nombre
+  coincide exactamente con cualquier entrada de la lista, DESCÁRTALO. No uses criterio
+  de "es muy conocido" — usa solo la lista proporcionada.
 
-- local_candidates: máximo 5. Usa SOLO eventos de [C] donde el artista NO esté en la
-  lista de conocidos/seguidos (artistas desconocidos que encajen con géneros del usuario).
-  NO repetir artistas ya incluidos en concerts.
+- local_candidates: máximo 5. Usa SOLO eventos de [C] cuyo artista NO aparezca
+  en la lista de conocidos/seguidos (comprobación literal, sin mayúsculas).
+  NUNCA incluyas aquí un artista que ya esté en concerts.
 
 - Todo el texto explicativo en español.
 - Si no hay datos para un bloque, devuelve [].
