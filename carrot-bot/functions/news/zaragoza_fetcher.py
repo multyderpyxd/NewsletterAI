@@ -25,8 +25,9 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup, Tag, SoupStrainer
 
-REQUEST_DELAY = 0.4
-TIMEOUT = 10
+REQUEST_DELAY  = 0.4
+TIMEOUT        = 10
+MAX_PAGES      = 4   # máximo de páginas a seguir por sala Union25
 
 # ─── Salas y sus URLs de agenda ───────────────────────────────────────────────
 
@@ -439,62 +440,66 @@ def _parse_sweetcaroline(soup: BeautifulSoup, source_url: str) -> list[dict]:
     return events
 
 
+def _parse_date_conciertos_club(text: str) -> str:
+    """
+    Parsea el formato de fecha de conciertos.club: 'V29/5/26 20:00'
+    (letra día opcional + DD/M/YY + hora opcional).
+    Devuelve 'DD/MM/YYYY HH:MM' o '' si no hay fecha.
+    """
+    m = re.search(r"[LMXJVSD]?(\d{1,2})/(\d{1,2})/(\d{2,4})", text)
+    if not m:
+        return ""
+    day, month, year = m.group(1), m.group(2), m.group(3)
+    if len(year) == 2:
+        year = "20" + year
+    date = f"{day.zfill(2)}/{month.zfill(2)}/{year}"
+    m_time = re.search(r"\b(\d{1,2}:\d{2})\b", text)
+    if m_time:
+        date += f" {m_time.group(1)}"
+    return date
+
+
 def _parse_conciertos_club(soup: BeautifulSoup, venue: str, source_url: str) -> list[dict]:
     """
-    Conciertos.club usa cards con nombre de artista, sala y fecha.
+    Conciertos.club estructura cada evento como:
+      <div>
+        <div>V29/5/26<br>20:00</div>   ← fecha
+        <a href="/zaragoza/conciertos/ID-slug"><img></a>
+        <a href="/zaragoza/conciertos/ID-slug">Nombre artista</a>
+        <span>Género</span>
+        <a href="/zaragoza/locales/...">Sala. Zaragoza</a>
+        <span>Precio</span>
+      </div>
+    Los enlaces de evento tienen '/zaragoza/conciertos/' en el href.
     """
-    events = []
+    events  = []
+    seen    = set()
 
-    selectors = [
-        ".event-card", ".concierto-item", ".concert-item",
-        "article", ".item", ".event",
-    ]
-
-    cards = []
-    for sel in selectors:
-        found = soup.select(sel)
-        if found:
-            cards = found
-            break
-
-    # Fallback: todos los enlaces con texto razonable
-    if not cards:
-        for a in soup.find_all("a", href=True):
-            text = _clean(a.get_text(" "))
-            if 5 < len(text) < 120:
-                url = urljoin(source_url, a["href"])
-                if "/zaragoza" in url or venue:
-                    events.append({
-                        "artist": text,
-                        "event":  text,
-                        "date":   "",
-                        "venue":  venue,
-                        "url":    url,
-                        "source": "Conciertos.club",
-                    })
-        return events[:20]
-
-    for card in cards:
-        title_tag = card.find(["h1", "h2", "h3", "h4", "strong", ".title", ".name"])
-        if not title_tag:
-            title_tag = card
-        title = _clean(title_tag.get_text(" "))
-        if not title or len(title) < 3:
+    for a in soup.find_all("a", href=True):
+        href = a.get("href", "")
+        if "/zaragoza/conciertos/" not in href:
             continue
 
+        title = _clean(a.get_text(" "))
+        if not title or len(title) < 3:
+            continue  # saltar enlace de imagen (sin texto)
+
+        url = urljoin(source_url, href)
+        if url in seen:
+            continue
+        seen.add(url)
+
+        # Buscar fecha en los hijos del contenedor padre
         date = ""
-        date_tag = card.find("time")
-        if date_tag:
-            date = _clean(date_tag.get("datetime") or date_tag.get_text(" "))
-
-        if not date:
-            card_text = _clean(card.get_text(" "))
-            m_date = re.search(r"\b\d{1,2}/\d{1,2}/\d{4}\b", card_text)
-            if m_date:
-                date = m_date.group(0)
-
-        link_tag = card.find("a", href=True)
-        url = urljoin(source_url, link_tag["href"]) if link_tag else source_url
+        parent = a.parent
+        if isinstance(parent, Tag):
+            for child in parent.children:
+                if not isinstance(child, Tag):
+                    continue
+                child_text = _clean(child.get_text(" "))
+                date = _parse_date_conciertos_club(child_text)
+                if date:
+                    break
 
         events.append({
             "artist": title,
@@ -584,6 +589,53 @@ def _dedupe(events: list[dict]) -> list[dict]:
 
     return result
 
+# ─── Paginación Union25 ───────────────────────────────────────────────────────
+
+def _next_page_url(soup: BeautifulSoup, current_url: str) -> str | None:
+    """
+    Detecta el enlace 'Siguiente' / 'next' de paginación WordPress.
+    Union25 usa .next.page-numbers o enlaces con rel="next".
+    """
+    # Busca enlace con clase 'next page-numbers' (WordPress estándar)
+    next_a = soup.find("a", class_=lambda c: c and "next" in c and "page-numbers" in c)
+    if next_a and next_a.get("href"):
+        return urljoin(current_url, next_a["href"])
+
+    # Fallback: rel="next"
+    next_a = soup.find("a", rel=lambda r: r and "next" in r)
+    if next_a and next_a.get("href"):
+        return urljoin(current_url, next_a["href"])
+
+    return None
+
+
+def _fetch_union25_all_pages(base_url: str, venue: str) -> list[dict]:
+    """
+    Scrapea todas las páginas de una sala Union25 hasta MAX_PAGES.
+    """
+    all_events: list[dict] = []
+    url = base_url
+    page = 1
+
+    while url and page <= MAX_PAGES:
+        soup = _get(url)
+        if not soup:
+            break
+
+        events = _parse_union25(soup, venue, url)
+        all_events.extend(events)
+
+        next_url = _next_page_url(soup, url)
+        if not next_url or next_url == url:
+            break
+
+        url = next_url
+        page += 1
+        time.sleep(REQUEST_DELAY)
+
+    return all_events
+
+
 # ─── Función principal ────────────────────────────────────────────────────────
 
 def fetch_zaragoza_venue_agenda() -> list[dict]:
@@ -598,21 +650,22 @@ def fetch_zaragoza_venue_agenda() -> list[dict]:
         url = source["url"]
         venue = source["venue"]
 
-        soup = _get(url)
-        if not soup:
-            time.sleep(REQUEST_DELAY)
-            continue
-
-        if "sweetcaroline.app" in url:
-            events = _parse_sweetcaroline(soup, url)
-        elif "union25" in url:
-            events = _parse_union25(soup, venue, url)
-        elif "conciertos.club" in url:
-            events = _parse_conciertos_club(soup, venue, url)
-        elif "aragonmusical" in url:
-            events = _parse_aragon_musical(soup, url)
+        if "union25" in url:
+            events = _fetch_union25_all_pages(url, venue)
         else:
-            events = []
+            soup = _get(url)
+            if not soup:
+                time.sleep(REQUEST_DELAY)
+                continue
+
+            if "sweetcaroline.app" in url:
+                events = _parse_sweetcaroline(soup, url)
+            elif "conciertos.club" in url:
+                events = _parse_conciertos_club(soup, venue, url)
+            elif "aragonmusical" in url:
+                events = _parse_aragon_musical(soup, url)
+            else:
+                events = []
 
         print(f"  Zaragoza [{source['source']} / {venue or 'general'}] → {len(events)} eventos")
         all_events.extend(events)
