@@ -18,9 +18,10 @@ import time
 import requests
 from datetime import datetime, timedelta
 
-TICKETMASTER_API = "https://app.ticketmaster.com/discovery/v2/events.json"
-REQUEST_DELAY    = 0.3   # segundos entre llamadas (rate limit: 5 req/s)
-MONTHS_AHEAD     = 12    # buscar conciertos hasta X meses en el futuro
+TICKETMASTER_API         = "https://app.ticketmaster.com/discovery/v2/events.json"
+TICKETMASTER_ATTRACTIONS = "https://app.ticketmaster.com/discovery/v2/attractions.json"
+REQUEST_DELAY            = 0.3   # segundos entre llamadas (rate limit: 5 req/s)
+MONTHS_AHEAD             = 12    # buscar conciertos hasta X meses en el futuro
 
 # ─── Mapas de proximidad ──────────────────────────────────────────────────────
 
@@ -147,11 +148,38 @@ def _parse_event(event: dict, artist_name: str) -> dict | None:
     }
 
 
+# ─── Lookup de attraction ID ─────────────────────────────────────────────────
+
+def _find_attraction_id(artist_name: str, api_key: str) -> str | None:
+    """
+    Busca el ID de attraction exacto para un artista en Ticketmaster.
+    Hace matching exacto por nombre (insensible a mayúsculas).
+    Devuelve None si no hay coincidencia exacta.
+    """
+    try:
+        response = requests.get(
+            TICKETMASTER_ATTRACTIONS,
+            params={"apikey": api_key, "keyword": artist_name, "size": 5},
+            timeout=8,
+        )
+        if response.status_code != 200:
+            return None
+        attractions = response.json().get("_embedded", {}).get("attractions", [])
+        artist_lower = artist_name.lower()
+        for att in attractions:
+            if att.get("name", "").lower() == artist_lower:
+                return att["id"]
+    except Exception:
+        pass
+    return None
+
+
 # ─── Fetcher principal ────────────────────────────────────────────────────────
 
 def fetch_ticketmaster_concerts(artists: list[str]) -> list[dict]:
     """
     Busca conciertos en Europa para cada artista de la lista.
+    Usa attractionId cuando es posible para evitar falsos positivos por keyword.
     Devuelve eventos ordenados por proximidad a España.
     """
     api_key = os.getenv("TICKETMASTER_API_KEY")
@@ -165,18 +193,24 @@ def fetch_ticketmaster_concerts(artists: list[str]) -> list[dict]:
 
     for artist_name in artists:
         try:
-            response = requests.get(
-                TICKETMASTER_API,
-                params={
-                    "apikey":        api_key,
-                    "keyword":       artist_name,
-                    "size":          10,
-                    "startDateTime": start_date,
-                    "endDateTime":   end_date,
-                    "sort":          "date,asc",
-                },
-                timeout=8,
-            )
+            # Paso 1: buscar el attraction ID exacto del artista
+            attraction_id = _find_attraction_id(artist_name, api_key)
+            time.sleep(REQUEST_DELAY)
+
+            # Paso 2: buscar eventos por attractionId (preciso) o keyword (fallback)
+            params: dict = {
+                "apikey":        api_key,
+                "size":          10,
+                "startDateTime": start_date,
+                "endDateTime":   end_date,
+                "sort":          "date,asc",
+            }
+            if attraction_id:
+                params["attractionId"] = attraction_id
+            else:
+                params["keyword"] = artist_name
+
+            response = requests.get(TICKETMASTER_API, params=params, timeout=8)
 
             if response.status_code == 429:
                 print(f"  ⚠️  Ticketmaster rate limit, esperando...")
