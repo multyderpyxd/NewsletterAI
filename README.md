@@ -1,6 +1,6 @@
 # NewsletterAI — CarrotBot 🥕
 
-CarrotBot es un bot de newsletter musical personalizado. Cada semana agrega datos de múltiples fuentes (Ticketmaster, Last.fm, Spotify, RSS y scrapers de salas locales), los procesa con un modelo de lenguaje (GPT-4.1-mini) y envía un email HTML con cuatro bloques: conciertos, lanzamientos, descubrimientos y agenda local en Zaragoza.
+CarrotBot es un bot de newsletter musical personalizado. Cada semana agrega datos de múltiples fuentes (Ticketmaster, Last.fm, Spotify, RSS y scrapers de salas locales), los procesa con un modelo de lenguaje (GPT-4.1) y envía un email HTML con cuatro bloques: conciertos, lanzamientos, descubrimientos y agenda local en Zaragoza.
 
 ---
 
@@ -225,7 +225,7 @@ El proyecto carga un fichero `.env` desde `carrot-bot/functions/.env`.
 | Variable | Descripción |
 |---|---|
 | `OPENAI_API_KEY` | Clave de OpenAI para el procesamiento con IA |
-| `OPENAI_MODEL` | Modelo a usar (por defecto: `gpt-4.1-mini`) |
+| `OPENAI_MODEL` | Modelo a usar (por defecto: `gpt-4.1`) |
 | `LASTFM_API_KEY` | Clave de la API de Last.fm |
 | `SPOTIFY_CLIENT_ID` | Client ID de la app de Spotify |
 | `SPOTIFY_CLIENT_SECRET` | Client Secret de la app de Spotify |
