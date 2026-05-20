@@ -159,6 +159,20 @@ def _normalize(result: dict) -> dict:
     return result
 
 
+def _artist_is_known(artist_field: str, known_set: set[str]) -> bool:
+    """
+    Comprueba si alguno de los artistas en un campo de artista pertenece
+    al conjunto de conocidos. Divide por separadores habituales de cartelería
+    ('+', '&', 'feat.', 'vs') para manejar casos como
+    'Pink Breath of Heaven + Nuevos Mundos'.
+    """
+    name = artist_field.lower().strip()
+    if name in known_set:
+        return True
+    parts = re.split(r"\s*[+&]\s*|\s+feat\.?\s+|\s+vs\.?\s+", name)
+    return any(p.strip() in known_set for p in parts if p.strip())
+
+
 def _sort_local_candidates(candidates: list[dict], followed: set[str]) -> list[dict]:
     """
     Reordena local_candidates en código (no dependemos de la IA para esto):
@@ -166,8 +180,8 @@ def _sort_local_candidates(candidates: list[dict], followed: set[str]) -> list[d
       2. Artistas desconocidos → después
     Dentro de cada grupo mantiene el orden de fecha que dio la IA.
     """
-    known   = [{**c, "is_known": True}  for c in candidates if c.get("artist", "").lower().strip() in followed]
-    unknown = [{**c, "is_known": False} for c in candidates if c.get("artist", "").lower().strip() not in followed]
+    known   = [{**c, "is_known": True}  for c in candidates if     _artist_is_known(c.get("artist",""), followed)]
+    unknown = [{**c, "is_known": False} for c in candidates if not _artist_is_known(c.get("artist",""), followed)]
     return known + unknown
 
 
@@ -217,11 +231,11 @@ def _build_prompt(
     excluded = followed_artists | recently_recommended
     zaragoza_known   = [
         e for e in zaragoza_agenda
-        if e.get("artist", "").lower().strip() in excluded
+        if     _artist_is_known(e.get("artist", ""), excluded)
     ]
     zaragoza_unknown = enrich_with_genres([
         e for e in zaragoza_agenda
-        if e.get("artist", "").lower().strip() not in excluded
+        if not _artist_is_known(e.get("artist", ""), excluded)
     ])
 
     return f"""
