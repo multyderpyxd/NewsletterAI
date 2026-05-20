@@ -159,6 +159,18 @@ def _normalize(result: dict) -> dict:
     return result
 
 
+def _sort_local_candidates(candidates: list[dict], followed: set[str]) -> list[dict]:
+    """
+    Reordena local_candidates en código (no dependemos de la IA para esto):
+      1. Artistas que el usuario sigue/conoce → primero
+      2. Artistas desconocidos → después
+    Dentro de cada grupo mantiene el orden de fecha que dio la IA.
+    """
+    known   = [c for c in candidates if c.get("artist", "").lower().strip() in followed]
+    unknown = [c for c in candidates if c.get("artist", "").lower().strip() not in followed]
+    return known + unknown
+
+
 def _fmt(items: list[dict], keys: list[str], limit: int = 999) -> str:
     if not items:
         return "  (sin datos)"
@@ -308,15 +320,10 @@ Reglas ESTRICTAS:
   coincide exactamente con cualquier entrada de la lista, DESCÁRTALO. No uses criterio
   de "es muy conocido" — usa solo la lista proporcionada.
 
-- local_candidates: máximo 6. Usa TODOS los eventos de [C] relevantes.
-  ORDENACIÓN OBLIGATORIA — primero los conocidos, luego los desconocidos:
-    1. GRUPO A (conocidos): eventos cuyo artista aparezca LITERALMENTE en la lista
-       de excluidos (ignorando mayúsculas). Estos van SIEMPRE primero, son prioridad
-       absoluta aunque el género no encaje perfectamente.
-    2. GRUPO B (desconocidos): eventos cuyo artista NO esté en la lista, que encajen
-       con los géneros del usuario.
-  Dentro de cada grupo ordena por fecha ascendente.
-  El campo `reason` del GRUPO A debe indicar que es un artista seguido por el usuario.
+- local_candidates: máximo 6. Incluye eventos de [C] relevantes: tanto artistas
+  conocidos/seguidos (independientemente del género) como desconocidos que encajen
+  con los géneros del usuario. El orden final lo gestiona el sistema, no es necesario
+  que los ordenes tú.
 
 - Todo el texto explicativo en español.
 - Si no hay datos para un bloque, devuelve [].
@@ -397,6 +404,11 @@ def aggregate(artists: list[str], genres: list[str]) -> dict:
     )
 
     result = call_ai(prompt)
+
+    # Reordenar local_candidates en código: conocidos primero, desconocidos después
+    result["local_candidates"] = _sort_local_candidates(
+        result.get("local_candidates", []), followed
+    )
 
     # Guardar descubrimientos en el historial para no repetirlos
     _record_discoveries(result, history)

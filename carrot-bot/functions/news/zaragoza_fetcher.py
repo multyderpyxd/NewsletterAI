@@ -591,46 +591,33 @@ def _dedupe(events: list[dict]) -> list[dict]:
 
 # ─── Paginación Union25 ───────────────────────────────────────────────────────
 
-def _next_page_url(soup: BeautifulSoup, current_url: str) -> str | None:
-    """
-    Detecta el enlace 'Siguiente' / 'next' de paginación WordPress.
-    Union25 usa .next.page-numbers o enlaces con rel="next".
-    """
-    # Busca enlace con clase 'next page-numbers' (WordPress estándar)
-    next_a = soup.find("a", class_=lambda c: c and "next" in c and "page-numbers" in c)
-    if next_a and next_a.get("href"):
-        return urljoin(current_url, next_a["href"])
-
-    # Fallback: rel="next"
-    next_a = soup.find("a", rel=lambda r: r and "next" in r)
-    if next_a and next_a.get("href"):
-        return urljoin(current_url, next_a["href"])
-
-    return None
-
-
 def _fetch_union25_all_pages(base_url: str, venue: str) -> list[dict]:
     """
     Scrapea todas las páginas de una sala Union25 hasta MAX_PAGES.
+    Union25 usa paginación numerada: base_url, base_url/2/, base_url/3/, ...
+    Para cuando la página devuelve eventos ya vistos o ninguno nuevo.
     """
     all_events: list[dict] = []
-    url = base_url
-    page = 1
+    seen_event_urls: set[str] = set()
+    base = base_url.rstrip("/")
 
-    while url and page <= MAX_PAGES:
+    for page in range(1, MAX_PAGES + 1):
+        url = base_url if page == 1 else f"{base}/{page}/"
+
         soup = _get(url)
         if not soup:
             break
 
-        events = _parse_union25(soup, venue, url)
+        events   = _parse_union25(soup, venue, url)
+        new_ones = [e for e in events if e.get("url") not in seen_event_urls]
+
+        if not new_ones and page > 1:
+            break  # sin eventos nuevos → no hay más páginas
+
+        for e in events:
+            seen_event_urls.add(e.get("url", ""))
+
         all_events.extend(events)
-
-        next_url = _next_page_url(soup, url)
-        if not next_url or next_url == url:
-            break
-
-        url = next_url
-        page += 1
         time.sleep(REQUEST_DELAY)
 
     return all_events
