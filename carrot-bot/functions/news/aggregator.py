@@ -27,6 +27,55 @@ from news.zaragoza_fetcher      import fetch_zaragoza_venue_agenda
 from news.ticketmaster_fetcher  import fetch_ticketmaster_concerts
 
 
+# ─── Historial de descubrimientos ────────────────────────────────────────────
+
+DISCOVERIES_HISTORY_PATH = Path(__file__).parent.parent / "spotify" / "data" / "discoveries_history.json"
+DISCOVERIES_EXCLUDE_WEEKS = 8   # no repetir un descubrimiento durante N semanas
+
+
+def _load_discoveries_history() -> dict[str, str]:
+    """Carga {nombre_artista: fecha_recomendado} del historial."""
+    if not DISCOVERIES_HISTORY_PATH.exists():
+        return {}
+    try:
+        return json.loads(DISCOVERIES_HISTORY_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_discoveries_history(history: dict[str, str]) -> None:
+    """Guarda el historial actualizado, purgando entradas antiguas."""
+    cutoff = datetime.now() - timedelta(weeks=DISCOVERIES_EXCLUDE_WEEKS)
+    pruned = {
+        name: date_str
+        for name, date_str in history.items()
+        if datetime.fromisoformat(date_str) >= cutoff
+    }
+    DISCOVERIES_HISTORY_PATH.write_text(
+        json.dumps(pruned, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def _recently_recommended(history: dict[str, str]) -> set[str]:
+    """Devuelve nombres en minúsculas recomendados dentro de la ventana de exclusión."""
+    cutoff = datetime.now() - timedelta(weeks=DISCOVERIES_EXCLUDE_WEEKS)
+    return {
+        name.lower()
+        for name, date_str in history.items()
+        if datetime.fromisoformat(date_str) >= cutoff
+    }
+
+
+def _record_discoveries(result: dict, history: dict[str, str]) -> None:
+    """Añade los descubrimientos de esta ejecución al historial."""
+    today = datetime.now().date().isoformat()
+    for d in result.get("discoveries", []):
+        name = d.get("name", "").strip()
+        if name:
+            history[name] = today
+
+
 # ─── Carga de artistas seguidos ───────────────────────────────────────────────
 
 def _load_followed_artists() -> set[str]:
@@ -128,21 +177,22 @@ def _fmt(items: list[dict], keys: list[str], limit: int = 999) -> str:
 # ─── Prompt builder ───────────────────────────────────────────────────────────
 
 def _build_prompt(
-    artists:           list[str],
-    genres:            list[str],
-    followed_artists:  set[str],
-    ticketmaster:      list[dict],
-    rss_articles:      list[dict],
-    zaragoza_agenda:   list[dict],
-    lastfm_releases:   list[dict],
-    spotify_releases:  list[dict],
-    similar_artists:   list[dict],
-    related_artists:   list[dict],
+    artists:              list[str],
+    genres:               list[str],
+    followed_artists:     set[str],
+    recently_recommended: set[str],
+    ticketmaster:         list[dict],
+    rss_articles:         list[dict],
+    zaragoza_agenda:      list[dict],
+    lastfm_releases:      list[dict],
+    spotify_releases:     list[dict],
+    similar_artists:      list[dict],
+    related_artists:      list[dict],
 ) -> str:
 
     today_str  = datetime.now().strftime("%Y-%m-%d")
     cutoff_str = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
-    all_known  = sorted(followed_artists)
+    all_known  = sorted(followed_artists | recently_recommended)
 
     rss_text = "\n".join(
         f"  [{i+1}] {a.get('source','')} — {a.get('title','')}\n"
@@ -159,7 +209,7 @@ Perfil del usuario:
   Géneros favoritos:  {", ".join(genres)}
   Ciudad: Zaragoza, España
 
-Lista COMPLETA de artistas que el usuario ya conoce/sigue:
+Lista COMPLETA de artistas excluidos de discoveries (conocidos/seguidos + recomendados en las últimas {DISCOVERIES_EXCLUDE_WEEKS} semanas):
   {", ".join(all_known[:200])}
 
 {PROXIMITY_CONTEXT}
@@ -242,14 +292,8 @@ Devuelve este JSON exacto y nada más:
 Reglas ESTRICTAS:
 - Devuelve SOLO el JSON. Sin texto antes ni después.
 
-- concerts: máximo 12. DOS fuentes, mutuamente excluyentes con local_candidates:
-    1. Datos de [A] (Ticketmaster): copia exactamente artist, event, dates, locations,
-       venue, proximity, price y url — no inventes ni modifiques nada.
-    2. Datos de [C] (salas de Zaragoza) ÚNICAMENTE si el nombre del artista aparece
-       de forma LITERAL (ignorando mayúsculas) en la lista de conocidos/seguidos.
-       Si hay la mínima duda, NO lo incluyas aquí. Usa proximity=0 y como source
-       el nombre de la sala.
-  Un artista de [C] puede estar en concerts O en local_candidates, NUNCA en ambos.
+- concerts: máximo 10. USA SOLO datos de [A] (Ticketmaster). Copia exactamente
+  artist, event, dates, locations, venue, proximity, price y url — no inventes nada.
   Ordena por proximity (0 primero). Para cada artista favorito con datos en [A],
   incluye al menos su concierto europeo más próximo aunque sea nivel 3 o 4.
 
@@ -260,13 +304,19 @@ Reglas ESTRICTAS:
   No inventes fechas ni URLs.
 
 - discoveries: exactamente 4 si hay datos. Compara el nombre de cada candidato de [F]
-  y [G] con la lista de conocidos de forma LITERAL e ignorando mayúsculas. Si el nombre
+  y [G] con la lista de excluidos de forma LITERAL e ignorando mayúsculas. Si el nombre
   coincide exactamente con cualquier entrada de la lista, DESCÁRTALO. No uses criterio
   de "es muy conocido" — usa solo la lista proporcionada.
 
-- local_candidates: máximo 5. Usa SOLO eventos de [C] cuyo artista NO aparezca
-  en la lista de conocidos/seguidos (comprobación literal, sin mayúsculas).
-  NUNCA incluyas aquí un artista que ya esté en concerts.
+- local_candidates: máximo 6. Usa TODOS los eventos de [C] relevantes.
+  ORDENACIÓN OBLIGATORIA — primero los conocidos, luego los desconocidos:
+    1. GRUPO A (conocidos): eventos cuyo artista aparezca LITERALMENTE en la lista
+       de excluidos (ignorando mayúsculas). Estos van SIEMPRE primero, son prioridad
+       absoluta aunque el género no encaje perfectamente.
+    2. GRUPO B (desconocidos): eventos cuyo artista NO esté en la lista, que encajen
+       con los géneros del usuario.
+  Dentro de cada grupo ordena por fecha ascendente.
+  El campo `reason` del GRUPO A debe indicar que es un artista seguido por el usuario.
 
 - Todo el texto explicativo en español.
 - Si no hay datos para un bloque, devuelve [].
@@ -307,11 +357,14 @@ def call_ai(prompt: str) -> dict:
 def aggregate(artists: list[str], genres: list[str]) -> dict:
     print("\n📡 Buscando datos...\n")
 
-    print("[1/6] Cargando artistas seguidos en Spotify...")
+    print("[1/6] Cargando artistas seguidos y historial de descubrimientos...")
     followed = _load_followed_artists()
     for a in artists:
         followed.add(a.lower())
-    print(f"  → {len(followed)} artistas conocidos (excluidos de descubrimientos)")
+    history            = _load_discoveries_history()
+    recent_recommended = _recently_recommended(history)
+    print(f"  → {len(followed)} artistas conocidos, "
+          f"{len(recent_recommended)} recomendados recientemente (excluidos de discoveries)")
 
     print("\n[2/6] Ticketmaster — conciertos en Europa...")
     ticketmaster = fetch_ticketmaster_concerts(artists)
@@ -330,19 +383,24 @@ def aggregate(artists: list[str], genres: list[str]) -> dict:
 
     print("\n[6/6] Procesando con IA...")
     prompt = _build_prompt(
-        artists          = artists,
-        genres           = genres,
-        followed_artists = followed,
-        ticketmaster     = ticketmaster,
-        rss_articles     = rss_articles,
-        zaragoza_agenda  = zaragoza_agenda,
-        lastfm_releases  = lastfm_releases,
-        spotify_releases = spotify_releases,
-        similar_artists  = similar,
-        related_artists  = related,
+        artists              = artists,
+        genres               = genres,
+        followed_artists     = followed,
+        recently_recommended = recent_recommended,
+        ticketmaster         = ticketmaster,
+        rss_articles         = rss_articles,
+        zaragoza_agenda      = zaragoza_agenda,
+        lastfm_releases      = lastfm_releases,
+        spotify_releases     = spotify_releases,
+        similar_artists      = similar,
+        related_artists      = related,
     )
 
     result = call_ai(prompt)
+
+    # Guardar descubrimientos en el historial para no repetirlos
+    _record_discoveries(result, history)
+    _save_discoveries_history(history)
 
     print(f"\n  ✅ Conciertos:          {len(result.get('concerts', []))}")
     print(f"  ✅ Lanzamientos:        {len(result.get('releases', []))}")
