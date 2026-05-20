@@ -1,0 +1,13 @@
+# config/ost_exclude.txt
+SQUARE ENIX MUSIC
+Christopher Larkin
+ConcernedApe
+Hideyuki Fukasawa
+David Fenn
+Lena Raine
+西浦智仁
+岡部啓一
+帆足圭吾
+阿保剛
+Yasunori Nishiki
+Max LL

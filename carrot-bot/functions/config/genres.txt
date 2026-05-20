@@ -1,0 +1,69 @@
+rock
+ambient
+shoegaze
+pop
+dream pop
+alternative metal
+alternative rock
+electronic
+progressive metal
+metalcore
+hard rock
+instrumental
+alternative
+classic rock
+progressive metalcore
+nu metal
+j-pop
+classical
+grunge
+indie
+djent
+piano
+indie pop
+disco
+funk
+soul
+contemporary classical
+math rock
+punk
+cinematic classical
+neoclassical darkwave
+synthwave
+j-rock
+noise rock
+glam rock
+emo
+pop punk
+rock transgresivo
+spanish rock
+black metal
+melodic black metal
+progressive black metal
+atmospheric
+progressive rock
+mathcore
+post-punk
+ethereal
+new age
+post-rock
+trip-hop
+indie rock
+math metal
+technical metal
+soft rock
+chiptune
+smooth jazz
+adult contemporary
+aor
+jazz
+orchestral
+neo-classical
+acid jazz
+dance
+metal
+electropop
+drone
+experimental
+noise
+dark ambient
