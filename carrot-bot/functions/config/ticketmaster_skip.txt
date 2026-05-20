@@ -1,0 +1,5 @@
+# Artistas a ignorar en Ticketmaster.
+# Añade aquí nombres que causan falsos positivos (colisiones de nombre en su base de datos).
+# Un nombre por línea. Las líneas con # son comentarios.
+
+Mili

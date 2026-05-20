@@ -17,6 +17,7 @@ import os
 import time
 import requests
 from datetime import datetime, timedelta
+from pathlib import Path
 
 TICKETMASTER_API         = "https://app.ticketmaster.com/discovery/v2/events.json"
 TICKETMASTER_ATTRACTIONS = "https://app.ticketmaster.com/discovery/v2/attractions.json"
@@ -176,6 +177,17 @@ def _find_attraction_id(artist_name: str, api_key: str) -> str | None:
 
 # ─── Fetcher principal ────────────────────────────────────────────────────────
 
+def _load_skip_list() -> set[str]:
+    skip_path = Path(__file__).parent.parent / "config" / "ticketmaster_skip.txt"
+    if not skip_path.exists():
+        return set()
+    return {
+        line.strip().lower()
+        for line in skip_path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    }
+
+
 def fetch_ticketmaster_concerts(artists: list[str]) -> list[dict]:
     """
     Busca conciertos en Europa para cada artista de la lista.
@@ -187,30 +199,32 @@ def fetch_ticketmaster_concerts(artists: list[str]) -> list[dict]:
         print("  ⚠️  TICKETMASTER_API_KEY no configurada")
         return []
 
+    skip = _load_skip_list()
     start_date, end_date = _date_range()
     all_events = []
     seen_ids   = set()
 
     for artist_name in artists:
+        if artist_name.lower() in skip:
+            continue
         try:
             # Paso 1: buscar el attraction ID exacto del artista
             attraction_id = _find_attraction_id(artist_name, api_key)
             time.sleep(REQUEST_DELAY)
 
-            # Paso 2: buscar eventos por attractionId (preciso) o keyword (fallback)
-            params: dict = {
+            # Paso 2: buscar eventos solo si hay attractionId exacto.
+            # Sin él preferimos cero resultados a falsos positivos.
+            if not attraction_id:
+                continue
+
+            response = requests.get(TICKETMASTER_API, params={
                 "apikey":        api_key,
+                "attractionId":  attraction_id,
                 "size":          10,
                 "startDateTime": start_date,
                 "endDateTime":   end_date,
                 "sort":          "date,asc",
-            }
-            if attraction_id:
-                params["attractionId"] = attraction_id
-            else:
-                params["keyword"] = artist_name
-
-            response = requests.get(TICKETMASTER_API, params=params, timeout=8)
+            }, timeout=8)
 
             if response.status_code == 429:
                 print(f"  ⚠️  Ticketmaster rate limit, esperando...")
