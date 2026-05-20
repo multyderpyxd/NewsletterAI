@@ -76,6 +76,64 @@ def _record_discoveries(result: dict, history: dict[str, str]) -> None:
             history[name] = today
 
 
+# ─── Historial de conciertos mostrados ───────────────────────────────────────
+
+CONCERTS_HISTORY_PATH = Path(__file__).parent.parent / "spotify" / "data" / "concerts_history.json"
+
+
+def _load_concerts_history() -> dict[str, dict]:
+    """
+    Carga {url: {first_shown, event_date, artist}} del historial.
+    Purga automáticamente conciertos cuya fecha ya pasó.
+    """
+    if not CONCERTS_HISTORY_PATH.exists():
+        return {}
+    try:
+        raw    = json.loads(CONCERTS_HISTORY_PATH.read_text(encoding="utf-8"))
+        today  = datetime.now().date().isoformat()
+        return {
+            url: meta for url, meta in raw.items()
+            if meta.get("event_date", "9999") >= today  # purga pasados
+        }
+    except Exception:
+        return {}
+
+
+def _save_concerts_history(history: dict[str, dict]) -> None:
+    CONCERTS_HISTORY_PATH.write_text(
+        json.dumps(history, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def _annotate_concerts(
+    concerts: list[dict],
+    history:  dict[str, dict],
+) -> list[dict]:
+    """
+    Añade is_new=True/False a cada concierto según si ya aparece en el historial.
+    """
+    annotated = []
+    for c in concerts:
+        url    = c.get("url", "")
+        is_new = url not in history
+        annotated.append({**c, "is_new": is_new})
+    return annotated
+
+
+def _record_concerts(result: dict, history: dict[str, dict]) -> None:
+    """Registra los conciertos mostrados en esta ejecución."""
+    today = datetime.now().date().isoformat()
+    for c in result.get("concerts", []):
+        url = c.get("url", "")
+        if url and url not in history:
+            history[url] = {
+                "first_shown": today,
+                "event_date":  (c.get("dates", "") or "")[:10],  # YYYY-MM-DD
+                "artist":      c.get("artist", ""),
+            }
+
+
 # ─── Carga de artistas seguidos ───────────────────────────────────────────────
 
 def _load_followed_artists() -> set[str]:
@@ -214,6 +272,7 @@ def _build_prompt(
     spotify_releases:     list[dict],
     similar_artists:      list[dict],
     related_artists:      list[dict],
+    concerts_history:     dict[str, dict] | None = None,
 ) -> str:
 
     today_str  = datetime.now().strftime("%Y-%m-%d")
@@ -226,6 +285,11 @@ def _build_prompt(
         f"      URL: {a.get('url','')}"
         for i, a in enumerate(rss_articles[:30])
     ) or "  (sin datos)"
+
+    # Separar conciertos Ticketmaster en nuevos (no vistos) y ya reportados
+    history  = concerts_history or {}
+    tm_new   = [c for c in ticketmaster if c.get("url", "") not in history]
+    tm_prev  = [c for c in ticketmaster if c.get("url", "") in history]
 
     # Separar agenda Zaragoza en conocidos vs desconocidos antes de enviarlo a la IA
     excluded = followed_artists | recently_recommended
@@ -253,8 +317,11 @@ Lista COMPLETA de artistas excluidos de discoveries (conocidos/seguidos + recome
 
 ━━━ DATOS DISPONIBLES ━━━
 
-[A] CONCIERTOS REALES EN EUROPA (Ticketmaster — datos 100% fiables):
-{_fmt(ticketmaster, ["artist", "event", "dates", "locations", "venue", "proximity", "price", "url"], 60)}
+[A-NEW] CONCIERTOS NUEVOS esta semana (Ticketmaster — no reportados antes):
+{_fmt(tm_new, ["artist", "event", "dates", "locations", "venue", "proximity", "price", "url"], 60) or "  (ninguno nuevo esta semana)"}
+
+[A-PREV] CONCIERTOS YA REPORTADOS en semanas anteriores (Ticketmaster — aún vigentes):
+{_fmt(tm_prev, ["artist", "event", "dates", "locations", "venue", "proximity", "price", "url"], 60) or "  (ninguno)"}
 
 [B] NOTICIAS RSS (pueden mencionar giras, tours o lanzamientos próximos):
 {rss_text}
@@ -332,10 +399,15 @@ Devuelve este JSON exacto y nada más:
 Reglas ESTRICTAS:
 - Devuelve SOLO el JSON. Sin texto antes ni después.
 
-- concerts: máximo 10. USA SOLO datos de [A] (Ticketmaster). Copia exactamente
+- concerts: máximo 10. USA SOLO datos de [A-NEW] y [A-PREV]. Copia exactamente
   artist, event, dates, locations, venue, proximity, price y url — no inventes nada.
-  Ordena por proximity (0 primero). Para cada artista favorito con datos en [A],
-  incluye al menos su concierto europeo más próximo aunque sea nivel 3 o 4.
+  PRIORIDAD OBLIGATORIA:
+    1. Incluye PRIMERO todos los de [A-NEW] (conciertos nuevos esta semana), ordenados
+       por proximity (0 primero). Son prioridad absoluta aunque sean de nivel 4.
+    2. Completa hasta 10 con los de [A-PREV] más relevantes (los más próximos
+       geográficamente y con fecha más cercana), para mantener la agenda completa.
+  Para cada artista favorito con datos en [A-NEW] o [A-PREV], intenta incluir
+  al menos su concierto más próximo aunque sea nivel 3 o 4.
 
 - releases: máximo 6. USA SOLO datos de [D], [E] o [B] con release_date posterior a
   {cutoff_str} o futura (upcoming). Si un lanzamiento no tiene fecha confirmada o
@@ -393,14 +465,16 @@ def call_ai(prompt: str) -> dict:
 def aggregate(artists: list[str], genres: list[str]) -> dict:
     print("\n📡 Buscando datos...\n")
 
-    print("[1/6] Cargando artistas seguidos y historial de descubrimientos...")
+    print("[1/6] Cargando artistas seguidos y historiales...")
     followed = _load_followed_artists()
     for a in artists:
         followed.add(a.lower())
-    history            = _load_discoveries_history()
-    recent_recommended = _recently_recommended(history)
+    disc_history       = _load_discoveries_history()
+    recent_recommended = _recently_recommended(disc_history)
+    conc_history       = _load_concerts_history()
     print(f"  → {len(followed)} artistas conocidos, "
-          f"{len(recent_recommended)} recomendados recientemente (excluidos de discoveries)")
+          f"{len(recent_recommended)} descubrimientos recientes excluidos, "
+          f"{len(conc_history)} conciertos en historial")
 
     print("\n[2/6] Ticketmaster — conciertos en Europa...")
     ticketmaster = fetch_ticketmaster_concerts(artists)
@@ -430,6 +504,7 @@ def aggregate(artists: list[str], genres: list[str]) -> dict:
         spotify_releases     = spotify_releases,
         similar_artists      = similar,
         related_artists      = related,
+        concerts_history     = conc_history,
     )
 
     result = call_ai(prompt)
@@ -439,9 +514,11 @@ def aggregate(artists: list[str], genres: list[str]) -> dict:
         result.get("local_candidates", []), followed
     )
 
-    # Guardar descubrimientos en el historial para no repetirlos
-    _record_discoveries(result, history)
-    _save_discoveries_history(history)
+    # Guardar historiales
+    _record_discoveries(result, disc_history)
+    _save_discoveries_history(disc_history)
+    _record_concerts(result, conc_history)
+    _save_concerts_history(conc_history)
 
     print(f"\n  ✅ Conciertos:          {len(result.get('concerts', []))}")
     print(f"  ✅ Lanzamientos:        {len(result.get('releases', []))}")
