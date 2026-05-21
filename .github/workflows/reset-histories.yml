@@ -1,0 +1,28 @@
+name: CarrotBot — Resetear historiales (solo para pruebas)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resetear historiales
+        run: |
+          echo '{}' > carrot-bot/functions/spotify/data/discoveries_history.json
+          echo '{}' > carrot-bot/functions/spotify/data/concerts_history.json
+
+      - name: Commit
+        run: |
+          git config user.name "CarrotBot"
+          git config user.email "carrotbot@users.noreply.github.com"
+          git add carrot-bot/functions/spotify/data/discoveries_history.json \
+                  carrot-bot/functions/spotify/data/concerts_history.json
+          git commit -m "chore: resetear historiales para pruebas [skip ci]"
+          git push
