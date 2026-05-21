@@ -19,6 +19,7 @@ jobs:
         working-directory: carrot-bot/functions
 
     env:
+      # ── Secretos (configurar en GitHub → Settings → Secrets and variables → Actions)
       OPENAI_API_KEY:        ${{ secrets.OPENAI_API_KEY }}
       LASTFM_API_KEY:        ${{ secrets.LASTFM_API_KEY }}
       SPOTIFY_CLIENT_ID:     ${{ secrets.SPOTIFY_CLIENT_ID }}
@@ -29,6 +30,16 @@ jobs:
       GMAIL_USER:            ${{ secrets.GMAIL_USER }}
       GMAIL_APP_PASSWORD:    ${{ secrets.GMAIL_APP_PASSWORD }}
       EMAIL_TO:              ${{ secrets.EMAIL_TO }}
+      GCS_BUCKET_NAME:       ${{ secrets.GCS_BUCKET_NAME }}
+
+      # ── Configuración (edita aquí directamente, no son valores sensibles)
+      OPENAI_MODEL:                      gpt-4.1
+      CARROTBOT_RELEASE_LOOKBACK_DAYS:   ${{ secrets.CARROTBOT_RELEASE_LOOKBACK_DAYS }}
+      CARROTBOT_RELEASE_LOOKAHEAD_DAYS:  ${{ secrets.CARROTBOT_RELEASE_LOOKAHEAD_DAYS }}
+      SPOTIFY_CACHE_TTL_HOURS:           ${{ secrets.SPOTIFY_CACHE_TTL_HOURS }}
+      SPOTIFY_MAX_ID_SEARCH_FALLBACKS:   ${{ secrets.SPOTIFY_MAX_ID_SEARCH_FALLBACKS }}
+      SPOTIFY_MAX_RELATED_SEEDS:         ${{ secrets.SPOTIFY_MAX_RELATED_SEEDS }}
+      SPOTIFY_REQUEST_DELAY:             ${{ secrets.SPOTIFY_REQUEST_DELAY }}
 
     steps:
       - uses: actions/checkout@v4
