@@ -1,1 +1,27 @@
-{}
+{
+  "https://www.ticketmaster.es/event/jamiroquai-iconica-santalucia-sevilla-fest-tickets/2034594644?language=en-us": {
+    "first_shown": "2026-05-21",
+    "event_date": "2026-07-16",
+    "artist": "Jamiroquai"
+  },
+  "https://www.ticketmaster.nl/event/guns-n-roses-world-tour-2026-%7C-vip-packages-tickets/2004829328?language=en-us": {
+    "first_shown": "2026-05-21",
+    "event_date": "2026-06-18",
+    "artist": "Guns N' Roses"
+  },
+  "https://www.ticketmaster.pl/event/guns-n-roses-world-tour-2026-tickets/1286001259?language=en-us": {
+    "first_shown": "2026-05-21",
+    "event_date": "2026-06-04",
+    "artist": "Guns N' Roses"
+  },
+  "https://www.ticketmaster.co.uk/download-2026-campervancaravan-derby-10-06-2026/event/360062C6EBFC34FD": {
+    "first_shown": "2026-05-21",
+    "event_date": "2026-06-10",
+    "artist": "Thornhill"
+  },
+  "https://www.ticketmaster.co.uk/download-2026-weekend-arena-derby-12-06-2026/event/360062C6D5B9306F": {
+    "first_shown": "2026-05-21",
+    "event_date": "2026-06-12",
+    "artist": "Thornhill"
+  }
+}
