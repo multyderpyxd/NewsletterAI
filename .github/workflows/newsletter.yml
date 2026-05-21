@@ -1,0 +1,54 @@
+name: CarrotBot — Newsletter Semanal
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'  # lunes 07:00 UTC = 08:00 Madrid (hora de invierno/CET)
+                          # en verano (CEST, UTC+2) serán las 09:00 Madrid
+                          # cambia a '0 6 * * 1' en verano si prefieres las 08:00 exactas
+  workflow_dispatch:      # permite lanzarlo manualmente desde GitHub → Actions
+
+permissions:
+  contents: write         # necesario para hacer commit de los historiales
+
+jobs:
+  newsletter:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: carrot-bot/functions
+
+    env:
+      OPENAI_API_KEY:        ${{ secrets.OPENAI_API_KEY }}
+      LASTFM_API_KEY:        ${{ secrets.LASTFM_API_KEY }}
+      SPOTIFY_CLIENT_ID:     ${{ secrets.SPOTIFY_CLIENT_ID }}
+      SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+      SPOTIFY_REDIRECT_URI:  ${{ secrets.SPOTIFY_REDIRECT_URI }}
+      SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+      TICKETMASTER_API_KEY:  ${{ secrets.TICKETMASTER_API_KEY }}
+      GMAIL_USER:            ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD:    ${{ secrets.GMAIL_APP_PASSWORD }}
+      EMAIL_TO:              ${{ secrets.EMAIL_TO }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: carrot-bot/functions/requirements.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar CarrotBot
+        run: python main.py --full
+
+      - name: Guardar historiales en el repo
+        run: |
+          git config user.name "CarrotBot"
+          git config user.email "carrotbot@users.noreply.github.com"
+          git add spotify/data/discoveries_history.json spotify/data/concerts_history.json
+          git diff --cached --quiet || git commit -m "chore: actualizar historiales [skip ci]"
+          git push
