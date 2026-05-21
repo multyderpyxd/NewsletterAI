@@ -123,23 +123,17 @@ def _card_close() -> str:
     return "</td></tr></table></td></tr>\n"
 
 
-def _collapsible(label: str, inner_html: str, color: str) -> str:
+def _secondary(inner_html: str, color: str) -> str:
     """
-    Sección desplegable usando <details>/<summary>.
-    Compatible con Gmail web, Apple Mail y Thunderbird.
-    En Outlook y apps móviles se muestra expandido (degradación aceptable).
+    Bloque de información secundaria visualmente de-enfatizado.
+    Separado del contenido principal por una línea tenue.
+    Gmail elimina la interactividad de <details>, así que usamos
+    jerarquía visual estática en lugar de collapse/expand.
     """
-    return f"""<details style="margin-top: 10px;">
-  <summary style="cursor: pointer; display: inline-block;
-    font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px;
-    color: {color}; outline: none; list-style: none; -webkit-appearance: none;">
-    &#9656; {_e(label)}
-  </summary>
-  <div style="margin-top: 10px; padding-top: 10px;
-    border-top: 1px solid {color}33;">
-    {inner_html}
-  </div>
-</details>"""
+    return f"""<div style="margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid {color}22;">
+  {inner_html}
+</div>"""
 
 
 def _link_button(url: str, label: str, color: str) -> str:
@@ -202,7 +196,7 @@ def _render_concerts(concerts: list[dict]) -> str:
             details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
   line-height: 1.6; margin-bottom: 4px;">{_e(c['summary'])}</div>"""
         details_html += _link_button(c.get("url",""), "Ver evento", color)
-        rows += _collapsible("Ver detalles", details_html, color)
+        rows += _secondary(details_html, color)
         rows += _card_close()
 
     return rows
@@ -236,7 +230,7 @@ def _render_releases(releases: list[dict]) -> str:
             details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
   line-height: 1.6; margin-bottom: 4px;">{_e(r['summary'])}</div>"""
         details_html += _link_button(r.get("url",""), "Escuchar", color)
-        rows += _collapsible("Ver descripción", details_html, color)
+        rows += _secondary(details_html, color)
         rows += _card_close()
 
     return rows
@@ -266,7 +260,7 @@ def _render_discoveries(discoveries: list[dict]) -> str:
             details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
   line-height: 1.6; font-style: italic; margin-bottom: 4px;">"{_e(d['reason'])}"</div>"""
         details_html += _link_button(d.get("url",""), "Descubrir", color)
-        rows += _collapsible("Por qué te puede gustar", details_html, color)
+        rows += _secondary(details_html, color)
         rows += _card_close()
 
     return rows
@@ -316,7 +310,7 @@ def _render_local_candidates(local_candidates: list[dict]) -> str:
             details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
   line-height: 1.6; margin-bottom: 4px;">{_e(item['reason'])}</div>"""
         details_html += _link_button(item.get("url",""), "Ver candidato", color)
-        rows += _collapsible("Ver detalles", details_html, color)
+        rows += _secondary(details_html, color)
         rows += _card_close()
 
     return rows

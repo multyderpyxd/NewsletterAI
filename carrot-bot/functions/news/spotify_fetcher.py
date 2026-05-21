@@ -25,9 +25,13 @@ from pathlib import Path
 
 load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 
-REQUEST_DELAY        = 0.5   # segundos entre llamadas individuales
-BATCH_SIZE           = 50    # máximo de IDs por llamada batch de Spotify
-RELEASE_MONTHS_WINDOW = 6   # filtrar lanzamientos más antiguos que N meses
+REQUEST_DELAY         = 1.0  # segundos entre llamadas (Spotify ~100 req/min; 1 s = margen seguro)
+BATCH_SIZE            = 50   # máximo de IDs por llamada batch de Spotify
+RELEASE_MONTHS_WINDOW = 6    # filtrar lanzamientos más antiguos que N meses
+
+# Caché de IDs dentro de la misma ejecución para evitar resolver los mismos artistas
+# dos veces (fetch_new_releases + fetch_related_artists llaman ambos a _resolve_artist_ids).
+_session_id_cache: dict[str, str] = {}
 
 
 def _is_recent_or_upcoming(release_date: str) -> bool:
@@ -95,16 +99,22 @@ def _spotify_retry_after(e: Exception) -> str:
 def _resolve_artist_ids(sp: spotipy.Spotify, artists: list[str]) -> dict[str, str]:
     """
     Devuelve {nombre_artista: spotify_id} para todos los artistas que se encuentren.
+    Usa caché de sesión para no repetir búsquedas ya realizadas en la misma ejecución.
     Si Spotify devuelve 429, corta Spotify inmediatamente sin esperar.
     """
     ids = {}
 
     for name in artists:
+        if name in _session_id_cache:
+            ids[name] = _session_id_cache[name]
+            continue
         try:
             results = sp.search(q=f"artist:{name}", type="artist", limit=1)
             items = results.get("artists", {}).get("items", [])
             if items:
-                ids[name] = items[0]["id"]
+                artist_id = items[0]["id"]
+                ids[name] = artist_id
+                _session_id_cache[name] = artist_id
 
         except Exception as e:
             if _is_spotify_rate_limit(e):
@@ -119,7 +129,8 @@ def _resolve_artist_ids(sp: spotipy.Spotify, artists: list[str]) -> dict[str, st
 
         time.sleep(REQUEST_DELAY)
 
-    print(f"  Spotify → {len(ids)}/{len(artists)} IDs resueltos")
+    cached = sum(1 for n in artists if n in _session_id_cache and n not in ids)
+    print(f"  Spotify → {len(ids)} IDs resueltos ({cached} desde caché)")
     return ids
 
 # ─── Lanzamientos recientes ───────────────────────────────────────────────────
