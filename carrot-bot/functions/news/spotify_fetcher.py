@@ -58,6 +58,7 @@ def _get_client() -> spotipy.Spotify | None:
                 redirect_uri=os.getenv("SPOTIFY_REDIRECT_URI"),
                 scope="user-top-read user-follow-read",
                 open_browser=False,
+                cache_path=str(Path(__file__).parent.parent / ".cache"),
             ),
             requests_timeout=10,
             retries=0,
