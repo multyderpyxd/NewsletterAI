@@ -34,12 +34,12 @@ jobs:
 
       # ── Configuración (edita aquí directamente, no son valores sensibles)
       OPENAI_MODEL:                      gpt-4.1
-      CARROTBOT_RELEASE_LOOKBACK_DAYS:   ${{ secrets.CARROTBOT_RELEASE_LOOKBACK_DAYS }}
-      CARROTBOT_RELEASE_LOOKAHEAD_DAYS:  ${{ secrets.CARROTBOT_RELEASE_LOOKAHEAD_DAYS }}
-      SPOTIFY_CACHE_TTL_HOURS:           ${{ secrets.SPOTIFY_CACHE_TTL_HOURS }}
-      SPOTIFY_MAX_ID_SEARCH_FALLBACKS:   ${{ secrets.SPOTIFY_MAX_ID_SEARCH_FALLBACKS }}
-      SPOTIFY_MAX_RELATED_SEEDS:         ${{ secrets.SPOTIFY_MAX_RELATED_SEEDS }}
-      SPOTIFY_REQUEST_DELAY:             ${{ secrets.SPOTIFY_REQUEST_DELAY }}
+      CARROTBOT_RELEASE_LOOKBACK_DAYS:   ${{ vars.CARROTBOT_RELEASE_LOOKBACK_DAYS }}
+      CARROTBOT_RELEASE_LOOKAHEAD_DAYS:  ${{ vars.CARROTBOT_RELEASE_LOOKAHEAD_DAYS }}
+      SPOTIFY_CACHE_TTL_HOURS:           ${{ vars.SPOTIFY_CACHE_TTL_HOURS }}
+      SPOTIFY_MAX_ID_SEARCH_FALLBACKS:   ${{ vars.SPOTIFY_MAX_ID_SEARCH_FALLBACKS }}
+      SPOTIFY_MAX_RELATED_SEEDS:         ${{ vars.SPOTIFY_MAX_RELATED_SEEDS }}
+      SPOTIFY_REQUEST_DELAY:             ${{ vars.SPOTIFY_REQUEST_DELAY }}
 
     steps:
       - uses: actions/checkout@v4
