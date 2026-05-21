@@ -11,12 +11,9 @@ Orquestador principal. Ejecuta el pipeline completo:
   python main.py               → pipeline estándar (sin refresh Spotify)
   python main.py --full        → pipeline completo (refresh Spotify + parse)
 
-── Ejecución en Firebase Cloud Functions ────────────────────────────────────
-  La función 'weekly_newsletter' se dispara automáticamente según SCHEDULE.
-
-── Cambiar el día u hora de envío ───────────────────────────────────────────
-  Edita SCHEDULE y TIMEZONE y vuelve a desplegar:
-    firebase deploy --only functions
+── Scheduling ───────────────────────────────────────────────────────────────
+  Gestionado por GitHub Actions (.github/workflows/newsletter.yml).
+  Para cambiar el día u hora edita el cron en ese fichero.
 """
 
 import os
@@ -32,12 +29,6 @@ from email_builder.sender  import send_email
 
 BOT_NAME      = "CarrotBot"
 EMAIL_SUBJECT = "🎵 CarrotBot — Tu resumen musical semanal"
-
-# ── Configuración del schedule ────────────────────────────────────────────────
-# Formato cron unix:  minuto hora día-mes mes día-semana
-# Días de semana:     0=domingo, 1=lunes, 2=martes, ..., 6=sábado
-SCHEDULE = "0 8 * * 1"    # lunes a las 08:00
-TIMEZONE  = "Europe/Madrid"
 
 
 # ── Pipeline principal ────────────────────────────────────────────────────────
@@ -112,33 +103,6 @@ def run_full_pipeline() -> None:
 
     print("\n[5/5] Guardando historiales en GCS...")
     push_histories()
-
-
-# ── Firebase Cloud Function ───────────────────────────────────────────────────
-
-try:
-    import firebase_admin
-    from firebase_functions import options, scheduler_fn
-
-    options.set_global_options(
-        region="europe-southwest1",
-        memory=options.MemoryOption.GB_1,
-        timeout_sec=540,
-    )
-
-    if not firebase_admin._apps:
-        firebase_admin.initialize_app()
-
-    @scheduler_fn.on_schedule(
-        schedule=SCHEDULE,
-        timezone=scheduler_fn.Timezone(TIMEZONE),
-    )
-    def weekly_newsletter(event: scheduler_fn.ScheduledEvent) -> None:
-        """Se ejecuta cada lunes a las 08:00 hora de Madrid."""
-        run_full_pipeline()
-
-except ImportError:
-    pass  # entorno local sin firebase_functions instalado
 
 
 # ── Punto de entrada local ────────────────────────────────────────────────────
