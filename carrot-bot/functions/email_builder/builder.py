@@ -123,6 +123,25 @@ def _card_close() -> str:
     return "</td></tr></table></td></tr>\n"
 
 
+def _collapsible(label: str, inner_html: str, color: str) -> str:
+    """
+    Sección desplegable usando <details>/<summary>.
+    Compatible con Gmail web, Apple Mail y Thunderbird.
+    En Outlook y apps móviles se muestra expandido (degradación aceptable).
+    """
+    return f"""<details style="margin-top: 10px;">
+  <summary style="cursor: pointer; display: inline-block;
+    font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px;
+    color: {color}; outline: none; list-style: none; -webkit-appearance: none;">
+    &#9656; {_e(label)}
+  </summary>
+  <div style="margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid {color}33;">
+    {inner_html}
+  </div>
+</details>"""
+
+
 def _link_button(url: str, label: str, color: str) -> str:
     safe = _safe_url(url)
     if not safe:
@@ -155,6 +174,7 @@ def _render_concerts(concerts: list[dict]) -> str:
         prox_num             = c.get("proximity", 4)
         prox_emoji, prox_label = PROXIMITY_LABELS.get(prox_num, ("🟢", "UE"))
         rows += _card_open(color)
+        # ── Info siempre visible ──────────────────────────────────────────────
         rows += f"""
 <div style="margin-bottom: 8px;">
   {_tag(prox_emoji + " " + prox_label, color)}
@@ -162,21 +182,27 @@ def _render_concerts(concerts: list[dict]) -> str:
 </div>
 <div style="font-family: Georgia, serif; font-size: 17px; font-weight: bold;
   color: {COLORS['text']}; margin-bottom: 4px;">{_e(c.get("artist",""))}</div>
-<div style="font-size: 13px; color: {color}; margin-bottom: 8px;
-  font-style: italic;">{_e(c.get("event",""))}</div>
-"""
-        if c.get("dates") or c.get("locations"):
-            rows += f"""<div style="font-size: 12px; color: {COLORS['text_muted']};
-  margin-bottom: 8px; font-family: 'Courier New', monospace;">"""
-            if c.get("dates"):     rows += f"📅 {_e(c['dates'])}&nbsp;&nbsp;"
-            if c.get("locations"): rows += f"📍 {_e(c['locations'])}"
-            if c.get("venue"):     rows += f"&nbsp;&nbsp;🏟️ {_e(c['venue'])}"
-            if c.get("price"):     rows += f"&nbsp;&nbsp;🎟️ {_e(c['price'])}"
-            rows += "</div>"
+<div style="font-size: 12px; color: {COLORS['text_muted']};
+  font-family: 'Courier New', monospace;">"""
+        if c.get("dates"):     rows += f"📅 {_e(c['dates'])}&nbsp;&nbsp;"
+        if c.get("locations"): rows += f"📍 {_e(c['locations'])}"
+        rows += "</div>"
+        # ── Sección desplegable ───────────────────────────────────────────────
+        details_html = ""
+        if c.get("event"):
+            details_html += f"""<div style="font-size: 13px; color: {color};
+  font-style: italic; margin-bottom: 8px;">{_e(c['event'])}</div>"""
+        if c.get("venue") or c.get("price"):
+            details_html += f"""<div style="font-size: 12px; color: {COLORS['text_muted']};
+  font-family: 'Courier New', monospace; margin-bottom: 8px;">"""
+            if c.get("venue"): details_html += f"🏟️ {_e(c['venue'])}&nbsp;&nbsp;"
+            if c.get("price"): details_html += f"🎟️ {_e(c['price'])}"
+            details_html += "</div>"
         if c.get("summary"):
-            rows += f"""<div style="font-size: 13px; color: {COLORS['text']};
-  line-height: 1.6; margin-top: 8px;">{_e(c['summary'])}</div>"""
-        rows += _link_button(c.get("url",""), "Ver evento", color)
+            details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
+  line-height: 1.6; margin-bottom: 4px;">{_e(c['summary'])}</div>"""
+        details_html += _link_button(c.get("url",""), "Ver evento", color)
+        rows += _collapsible("Ver detalles", details_html, color)
         rows += _card_close()
 
     return rows
@@ -202,13 +228,15 @@ def _render_releases(releases: list[dict]) -> str:
 </div>
 <div style="font-family: Georgia, serif; font-size: 17px; font-weight: bold;
   color: {COLORS['text']}; margin-bottom: 2px;">{_e(r.get("title",""))}</div>
-<div style="font-size: 12px; color: {color}; margin-bottom: 10px; letter-spacing: 1px;
+<div style="font-size: 12px; color: {color}; letter-spacing: 1px;
   text-transform: uppercase; font-family: 'Courier New', monospace;">{_e(r.get("artist",""))}</div>
 """
+        details_html = ""
         if r.get("summary"):
-            rows += f"""<div style="font-size: 13px; color: {COLORS['text']};
-  line-height: 1.6;">{_e(r['summary'])}</div>"""
-        rows += _link_button(r.get("url",""), "Escuchar", color)
+            details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
+  line-height: 1.6; margin-bottom: 4px;">{_e(r['summary'])}</div>"""
+        details_html += _link_button(r.get("url",""), "Escuchar", color)
+        rows += _collapsible("Ver descripción", details_html, color)
         rows += _card_close()
 
     return rows
@@ -231,12 +259,14 @@ def _render_discoveries(discoveries: list[dict]) -> str:
 """
         if d.get("similar_to"):
             rows += f"""<div style="font-size: 11px; color: {color}; letter-spacing: 1.5px;
-  text-transform: uppercase; font-family: 'Courier New', monospace;
-  margin-bottom: 10px;">Similar a {_e(d['similar_to'])}</div>"""
+  text-transform: uppercase; font-family: 'Courier New', monospace;">
+  Similar a {_e(d['similar_to'])}</div>"""
+        details_html = ""
         if d.get("reason"):
-            rows += f"""<div style="font-size: 13px; color: {COLORS['text']};
-  line-height: 1.6; font-style: italic;">"{_e(d['reason'])}"</div>"""
-        rows += _link_button(d.get("url",""), "Descubrir", color)
+            details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
+  line-height: 1.6; font-style: italic; margin-bottom: 4px;">"{_e(d['reason'])}"</div>"""
+        details_html += _link_button(d.get("url",""), "Descubrir", color)
+        rows += _collapsible("Por qué te puede gustar", details_html, color)
         rows += _card_close()
 
     return rows
@@ -269,20 +299,24 @@ def _render_local_candidates(local_candidates: list[dict]) -> str:
 <div style="font-family: Georgia, serif; font-size: 18px; font-weight: bold;
   color: {COLORS['text']}; margin-bottom: 4px;">{_e(item.get("artist",""))}</div>
 """
+        # fecha siempre visible
+        if date:
+            rows += f"""<div style="font-size: 12px; color: {COLORS['text_muted']};
+  font-family: 'Courier New', monospace;">📅 {_e(date)}</div>"""
+        # sección desplegable
+        details_html = ""
         event = item.get("event","")
         if event and event != item.get("artist",""):
-            rows += f"""<div style="font-size: 13px; color: {color}; margin-bottom: 8px;
-  font-style: italic;">{_e(event)}</div>"""
-        if date or item.get("venue"):
-            rows += f"""<div style="font-size: 12px; color: {COLORS['text_muted']};
-  margin-bottom: 8px; font-family: 'Courier New', monospace;">"""
-            if date:             rows += f"📅 {_e(date)}&nbsp;&nbsp;"
-            if item.get("venue"): rows += f"🏟️ {_e(item['venue'])}"
-            rows += "</div>"
+            details_html += f"""<div style="font-size: 13px; color: {color};
+  font-style: italic; margin-bottom: 8px;">{_e(event)}</div>"""
+        if item.get("venue"):
+            details_html += f"""<div style="font-size: 12px; color: {COLORS['text_muted']};
+  font-family: 'Courier New', monospace; margin-bottom: 8px;">🏟️ {_e(item['venue'])}</div>"""
         if item.get("reason"):
-            rows += f"""<div style="font-size: 13px; color: {COLORS['text']};
-  line-height: 1.6;">{_e(item['reason'])}</div>"""
-        rows += _link_button(item.get("url",""), "Ver candidato", color)
+            details_html += f"""<div style="font-size: 13px; color: {COLORS['text']};
+  line-height: 1.6; margin-bottom: 4px;">{_e(item['reason'])}</div>"""
+        details_html += _link_button(item.get("url",""), "Ver candidato", color)
+        rows += _collapsible("Ver detalles", details_html, color)
         rows += _card_close()
 
     return rows

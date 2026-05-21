@@ -257,22 +257,36 @@ def fetch_ticketmaster_concerts(artists: list[str]) -> list[dict]:
     # Ordena: primero por proximidad (0 mejor), luego por fecha
     all_events.sort(key=lambda e: (e["proximity"], e["dates"]))
 
-    # Deduplica: Ticketmaster devuelve múltiples "productos" para el mismo
-    # concierto (VIP, pases de camping, planes de pago, upgrades...).
-    # Conservamos solo el primer evento por (artista, día, sala).
+    # Deduplica por (artista, día, ciudad): elimina distintos tipos de entrada
+    # para el mismo concierto (VIP, upgrades, planes de pago, abonos de camping...).
+    # Usamos ciudad en lugar de sala porque "Ziggo Dome" y "Vinyl Room - Ziggo Dome"
+    # son el mismo recinto y no deben contar como dos conciertos distintos.
     seen_shows: set[tuple] = set()
     deduped: list[dict] = []
     for e in all_events:
+        city = (e.get("locations", "") or "").split(",")[0].strip().lower()
         show_key = (
             e.get("artist", "").lower().strip(),
             (e.get("dates", "") or "")[:10],
-            e.get("venue", "").lower().strip(),
+            city or e.get("venue", "").lower().strip(),
         )
         if show_key in seen_shows:
             continue
         seen_shows.add(show_key)
         deduped.append(e)
     all_events = deduped
+
+    # Limita a MAX_PER_ARTIST conciertos por artista (ya ordenados por proximidad),
+    # evitando que un artista en gira acapare toda la sección.
+    MAX_PER_ARTIST = 2
+    artist_count: dict[str, int] = {}
+    capped: list[dict] = []
+    for e in all_events:
+        key = e.get("artist", "").lower().strip()
+        if artist_count.get(key, 0) < MAX_PER_ARTIST:
+            capped.append(e)
+            artist_count[key] = artist_count.get(key, 0) + 1
+    all_events = capped
 
     # Resumen por nivel
     by_prox = {}
