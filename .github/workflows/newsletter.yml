@@ -32,14 +32,14 @@ jobs:
       EMAIL_TO:              ${{ secrets.EMAIL_TO }}
       GCS_BUCKET_NAME:       ${{ secrets.GCS_BUCKET_NAME }}
 
-      # ── Configuración (edita aquí directamente, no son valores sensibles)
+      # ── Configuración variables
       OPENAI_MODEL:                      gpt-4.1
-      CARROTBOT_RELEASE_LOOKBACK_DAYS:   ${{ vars.CARROTBOT_RELEASE_LOOKBACK_DAYS }}
-      CARROTBOT_RELEASE_LOOKAHEAD_DAYS:  ${{ vars.CARROTBOT_RELEASE_LOOKAHEAD_DAYS }}
-      SPOTIFY_CACHE_TTL_HOURS:           ${{ vars.SPOTIFY_CACHE_TTL_HOURS }}
-      SPOTIFY_MAX_ID_SEARCH_FALLBACKS:   ${{ vars.SPOTIFY_MAX_ID_SEARCH_FALLBACKS }}
-      SPOTIFY_MAX_RELATED_SEEDS:         ${{ vars.SPOTIFY_MAX_RELATED_SEEDS }}
-      SPOTIFY_REQUEST_DELAY:             ${{ vars.SPOTIFY_REQUEST_DELAY }}
+      CARROTBOT_RELEASE_LOOKBACK_DAYS:   180
+      CARROTBOT_RELEASE_LOOKAHEAD_DAYS:  365
+      SPOTIFY_CACHE_TTL_HOURS:           12
+      SPOTIFY_MAX_ID_SEARCH_FALLBACKS:   6
+      SPOTIFY_MAX_RELATED_SEEDS:         8
+      SPOTIFY_REQUEST_DELAY:             0.15
 
     steps:
       - uses: actions/checkout@v4
