@@ -30,7 +30,8 @@ jobs:
       GMAIL_USER:            ${{ secrets.GMAIL_USER }}
       GMAIL_APP_PASSWORD:    ${{ secrets.GMAIL_APP_PASSWORD }}
       EMAIL_TO:              ${{ secrets.EMAIL_TO }}
-      GCS_BUCKET_NAME:       ${{ secrets.GCS_BUCKET_NAME }}
+      # GCS_BUCKET_NAME no se usa en GitHub Actions — los historiales se
+      # persisten haciendo commit al repo al final de cada ejecución.
 
       # ── Configuración variables
       OPENAI_MODEL:                      gpt-4.1
