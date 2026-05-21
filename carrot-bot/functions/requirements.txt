@@ -1,8 +1,9 @@
-firebase_functions~=0.5.0
-firebase-functions
+firebase-functions~=0.5.0
 firebase-admin
 feedparser
 openai
 python-dotenv
-feedparser
 beautifulsoup4
+spotipy
+requests
+google-cloud-storage

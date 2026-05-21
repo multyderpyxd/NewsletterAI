@@ -1,0 +1,19 @@
+{
+  "functions": [
+    {
+      "source": "carrot-bot/functions",
+      "codebase": "carrot-bot",
+      "ignore": [
+        "venv",
+        ".venv",
+        "__pycache__",
+        "*.pyc",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "spotify/data/*.json",
+        ".cache"
+      ]
+    }
+  ]
+}
