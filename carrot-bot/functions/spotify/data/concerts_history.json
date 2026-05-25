@@ -23,5 +23,25 @@
     "first_shown": "2026-05-21",
     "event_date": "2026-06-12",
     "artist": "Thornhill"
+  },
+  "https://www.ticketmaster.at/event/mac-demarco-tour-2026-tickets/86773261?language=en-us": {
+    "first_shown": "2026-05-25",
+    "event_date": "2026-06-22",
+    "artist": "Mac DeMarco"
+  },
+  "https://www.ticketmaster.at/event/men-i-trust-equus-euro-tour-2026-tickets/1364054833?language=en-us": {
+    "first_shown": "2026-05-25",
+    "event_date": "2026-06-25",
+    "artist": "Men I Trust"
+  },
+  "https://www.ticketmaster.co.uk/mac-demarco-london-10-06-2026/event/3E006427F28D3B1B": {
+    "first_shown": "2026-05-25",
+    "event_date": "2026-06-10",
+    "artist": "Mac DeMarco"
+  },
+  "https://www.ticketmaster.se/event/men-i-trust-tickets/793326446?language=en-us": {
+    "first_shown": "2026-05-25",
+    "event_date": "2026-06-18",
+    "artist": "Men I Trust"
   }
 }
