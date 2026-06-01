@@ -43,5 +43,35 @@
     "first_shown": "2026-05-25",
     "event_date": "2026-06-18",
     "artist": "Men I Trust"
+  },
+  "https://www.ticketmaster.at/event/strawberry-guy-give-me-a-dream-tour-2026-tickets/1974032825?language=en-us": {
+    "first_shown": "2026-06-01",
+    "event_date": "2026-10-07",
+    "artist": "Strawberry Guy"
+  },
+  "https://www.ticketmaster.de/event/tokyo-tea-room-tickets/913462331?language=en-us": {
+    "first_shown": "2026-06-01",
+    "event_date": "2026-11-01",
+    "artist": "Tokyo Tea Room"
+  },
+  "https://www.ticketmaster.de/event/tokyo-tea-room-tickets/1856875389?language=en-us": {
+    "first_shown": "2026-06-01",
+    "event_date": "2026-11-02",
+    "artist": "Tokyo Tea Room"
+  },
+  "https://www.universe.com/events/strawberry-guy-tickets-D5YBHN?ref=ticketmaster": {
+    "first_shown": "2026-06-01",
+    "event_date": "2026-09-20",
+    "artist": "Strawberry Guy"
+  },
+  "https://www.ticketmaster.co.uk/wage-war-cardiff-15-01-2027/event/1F0064B4DDF66A25": {
+    "first_shown": "2026-06-01",
+    "event_date": "2027-01-15",
+    "artist": "Invent Animate"
+  },
+  "https://www.ticketmaster.co.uk/wage-war-london-16-01-2027/event/3E0064B5EA5A5A6B": {
+    "first_shown": "2026-06-01",
+    "event_date": "2027-01-16",
+    "artist": "Invent Animate"
   }
 }
