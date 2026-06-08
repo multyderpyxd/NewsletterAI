@@ -9,11 +9,6 @@
     "event_date": "2026-06-18",
     "artist": "Guns N' Roses"
   },
-  "https://www.ticketmaster.pl/event/guns-n-roses-world-tour-2026-tickets/1286001259?language=en-us": {
-    "first_shown": "2026-05-21",
-    "event_date": "2026-06-04",
-    "artist": "Guns N' Roses"
-  },
   "https://www.ticketmaster.co.uk/download-2026-campervancaravan-derby-10-06-2026/event/360062C6EBFC34FD": {
     "first_shown": "2026-05-21",
     "event_date": "2026-06-10",
@@ -73,5 +68,20 @@
     "first_shown": "2026-06-01",
     "event_date": "2027-01-16",
     "artist": "Invent Animate"
+  },
+  "https://www.ticketmaster.it/biglietti/earth-wind-fire-experience-by-al-mckay-35-pordenone-blues-c-festival-2026-pordenone-10-07-2026/event/pa1ynzfgs3ib": {
+    "first_shown": "2026-06-08",
+    "event_date": "2026-07-10",
+    "artist": "Earth, Wind & Fire"
+  },
+  "https://www.ticketmaster.dk/event/the-warning-tickets/381388546?language=en-us": {
+    "first_shown": "2026-06-08",
+    "event_date": "2026-06-28",
+    "artist": "The Warning"
+  },
+  "https://www.ticketmaster.pl/event/the-warning-tickets/583646841?language=en-us": {
+    "first_shown": "2026-06-08",
+    "event_date": "2026-06-30",
+    "artist": "The Warning"
   }
 }
