@@ -9,16 +9,6 @@
     "event_date": "2026-06-18",
     "artist": "Guns N' Roses"
   },
-  "https://www.ticketmaster.co.uk/download-2026-campervancaravan-derby-10-06-2026/event/360062C6EBFC34FD": {
-    "first_shown": "2026-05-21",
-    "event_date": "2026-06-10",
-    "artist": "Thornhill"
-  },
-  "https://www.ticketmaster.co.uk/download-2026-weekend-arena-derby-12-06-2026/event/360062C6D5B9306F": {
-    "first_shown": "2026-05-21",
-    "event_date": "2026-06-12",
-    "artist": "Thornhill"
-  },
   "https://www.ticketmaster.at/event/mac-demarco-tour-2026-tickets/86773261?language=en-us": {
     "first_shown": "2026-05-25",
     "event_date": "2026-06-22",
@@ -28,11 +18,6 @@
     "first_shown": "2026-05-25",
     "event_date": "2026-06-25",
     "artist": "Men I Trust"
-  },
-  "https://www.ticketmaster.co.uk/mac-demarco-london-10-06-2026/event/3E006427F28D3B1B": {
-    "first_shown": "2026-05-25",
-    "event_date": "2026-06-10",
-    "artist": "Mac DeMarco"
   },
   "https://www.ticketmaster.se/event/men-i-trust-tickets/793326446?language=en-us": {
     "first_shown": "2026-05-25",
@@ -83,5 +68,30 @@
     "first_shown": "2026-06-08",
     "event_date": "2026-06-30",
     "artist": "The Warning"
+  },
+  "https://www.ticketmaster.cz/event/mac-demarco-support-otto-benson-tickets/184855169?language=en-us": {
+    "first_shown": "2026-06-15",
+    "event_date": "2026-06-18",
+    "artist": "Mac DeMarco"
+  },
+  "https://www.ticketmaster.co.uk/bilmuri-cardiff-23-06-2026/event/36006445D5727DC0": {
+    "first_shown": "2026-06-15",
+    "event_date": "2026-06-23",
+    "artist": "Thornhill"
+  },
+  "https://www.ticketmaster.co.uk/bilmuri-the-kinda-hard-tour-birmingham-25-06-2026/event/3E006444F6087E27": {
+    "first_shown": "2026-06-15",
+    "event_date": "2026-06-25",
+    "artist": "Thornhill"
+  },
+  "https://www.universe.com/events/everywhere-at-once-midrift-tickets-6G8C1N?ref=ticketmaster": {
+    "first_shown": "2026-06-15",
+    "event_date": "2026-06-26",
+    "artist": "Midrift"
+  },
+  "https://www.ticketmaster.co.uk/all-points-east-lorde-london-22-08-2026/event/37006364B4B15CA1": {
+    "first_shown": "2026-06-15",
+    "event_date": "2026-08-22",
+    "artist": "PinkPantheress"
   }
 }
