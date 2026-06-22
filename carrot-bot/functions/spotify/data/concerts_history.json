@@ -4,11 +4,6 @@
     "event_date": "2026-07-16",
     "artist": "Jamiroquai"
   },
-  "https://www.ticketmaster.nl/event/guns-n-roses-world-tour-2026-%7C-vip-packages-tickets/2004829328?language=en-us": {
-    "first_shown": "2026-05-21",
-    "event_date": "2026-06-18",
-    "artist": "Guns N' Roses"
-  },
   "https://www.ticketmaster.at/event/mac-demarco-tour-2026-tickets/86773261?language=en-us": {
     "first_shown": "2026-05-25",
     "event_date": "2026-06-22",
@@ -17,11 +12,6 @@
   "https://www.ticketmaster.at/event/men-i-trust-equus-euro-tour-2026-tickets/1364054833?language=en-us": {
     "first_shown": "2026-05-25",
     "event_date": "2026-06-25",
-    "artist": "Men I Trust"
-  },
-  "https://www.ticketmaster.se/event/men-i-trust-tickets/793326446?language=en-us": {
-    "first_shown": "2026-05-25",
-    "event_date": "2026-06-18",
     "artist": "Men I Trust"
   },
   "https://www.ticketmaster.at/event/strawberry-guy-give-me-a-dream-tour-2026-tickets/1974032825?language=en-us": {
@@ -69,11 +59,6 @@
     "event_date": "2026-06-30",
     "artist": "The Warning"
   },
-  "https://www.ticketmaster.cz/event/mac-demarco-support-otto-benson-tickets/184855169?language=en-us": {
-    "first_shown": "2026-06-15",
-    "event_date": "2026-06-18",
-    "artist": "Mac DeMarco"
-  },
   "https://www.ticketmaster.co.uk/bilmuri-cardiff-23-06-2026/event/36006445D5727DC0": {
     "first_shown": "2026-06-15",
     "event_date": "2026-06-23",
@@ -93,5 +78,35 @@
     "first_shown": "2026-06-15",
     "event_date": "2026-08-22",
     "artist": "PinkPantheress"
+  },
+  "https://www.ticketmaster.nl/event/korn-tickets/1202331948?language=en-us": {
+    "first_shown": "2026-06-22",
+    "event_date": "2026-11-08",
+    "artist": "Architects"
+  },
+  "https://www.ticketmaster.be/event/korn-euro-tour-2026-tickets/449423323": {
+    "first_shown": "2026-06-22",
+    "event_date": "2026-11-09",
+    "artist": "Architects"
+  },
+  "https://www.ticketmaster.co.uk/i-prevail-the-violent-nature-tour-glasgow-20-09-2026/event/3E00633DACEE4134": {
+    "first_shown": "2026-06-22",
+    "event_date": "2026-09-20",
+    "artist": "Amira Elfeky"
+  },
+  "https://www.ticketmaster.co.uk/i-prevail-london-25-09-2026/event/1F00634139C7C441": {
+    "first_shown": "2026-06-22",
+    "event_date": "2026-09-25",
+    "artist": "Amira Elfeky"
+  },
+  "https://www.ticketweb.uk/event/unprocessed-manchester-academy-3-tickets/14753523?REFERRAL_ID=tmfeed": {
+    "first_shown": "2026-06-22",
+    "event_date": "2026-10-01",
+    "artist": "Daedric"
+  },
+  "https://www.ticketweb.uk/event/unprocessed-electric-ballroom-tickets/14753533?REFERRAL_ID=tmfeed": {
+    "first_shown": "2026-06-22",
+    "event_date": "2026-10-02",
+    "artist": "Daedric"
   }
 }
