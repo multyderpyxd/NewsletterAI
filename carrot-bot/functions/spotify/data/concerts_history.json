@@ -39,11 +39,6 @@
     "event_date": "2026-07-10",
     "artist": "Earth, Wind & Fire"
   },
-  "https://www.ticketmaster.pl/event/the-warning-tickets/583646841?language=en-us": {
-    "first_shown": "2026-06-08",
-    "event_date": "2026-06-30",
-    "artist": "The Warning"
-  },
   "https://www.ticketmaster.co.uk/all-points-east-lorde-london-22-08-2026/event/37006364B4B15CA1": {
     "first_shown": "2026-06-15",
     "event_date": "2026-08-22",
@@ -79,19 +74,24 @@
     "event_date": "2026-10-02",
     "artist": "Daedric"
   },
-  "https://www.ticketmaster.co.uk/bilmuri-glasgow-29-06-2026/event/3600644503F9B25D": {
-    "first_shown": "2026-06-29",
-    "event_date": "2026-06-29",
-    "artist": "Thornhill"
-  },
-  "https://www.ticketmaster.co.uk/bilmuri-glasgow-30-06-2026/event/360064451F7FC861": {
-    "first_shown": "2026-06-29",
-    "event_date": "2026-06-30",
-    "artist": "Thornhill"
-  },
   "https://www.ticketmaster.co.uk/all-points-east-presents-outbreak-deftones-london-23-08-2026/event/37006364F65697A3": {
     "first_shown": "2026-06-29",
     "event_date": "2026-08-23",
     "artist": "Wisp"
+  },
+  "https://www.ticketmaster.co.uk/loathe-liverpool-17-07-2026/event/350064B6F8DF709A": {
+    "first_shown": "2026-07-06",
+    "event_date": "2026-07-17",
+    "artist": "Loathe"
+  },
+  "https://www.ticketmaster.dk/event/o-days-2026-3-days-ticket-tickets/1991208375?language=en-us": {
+    "first_shown": "2026-07-06",
+    "event_date": "2026-07-30",
+    "artist": "PinkPantheress"
+  },
+  "https://www.ticketmaster.dk/event/o-days-2026-thursday--friday-2-day-ticket-tickets/1200120023?language=en-us": {
+    "first_shown": "2026-07-06",
+    "event_date": "2026-07-31",
+    "artist": "PinkPantheress"
   }
 }
