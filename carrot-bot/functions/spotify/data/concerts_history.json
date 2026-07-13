@@ -34,11 +34,6 @@
     "event_date": "2027-01-16",
     "artist": "Invent Animate"
   },
-  "https://www.ticketmaster.it/biglietti/earth-wind-fire-experience-by-al-mckay-35-pordenone-blues-c-festival-2026-pordenone-10-07-2026/event/pa1ynzfgs3ib": {
-    "first_shown": "2026-06-08",
-    "event_date": "2026-07-10",
-    "artist": "Earth, Wind & Fire"
-  },
   "https://www.ticketmaster.co.uk/all-points-east-lorde-london-22-08-2026/event/37006364B4B15CA1": {
     "first_shown": "2026-06-15",
     "event_date": "2026-08-22",
@@ -93,5 +88,15 @@
     "first_shown": "2026-07-06",
     "event_date": "2026-07-31",
     "artist": "PinkPantheress"
+  },
+  "https://www.ticketmaster.se/event/way-out-west-august-13-15-2026-tickets/1854460538?language=en-us": {
+    "first_shown": "2026-07-13",
+    "event_date": "2026-08-15",
+    "artist": "The Cure"
+  },
+  "https://www.ticketmaster.co.uk/the-cure-at-live-from-wythenshawe-manchester-21-08-2026/event/1F00633D6C0E2F4F": {
+    "first_shown": "2026-07-13",
+    "event_date": "2026-08-21",
+    "artist": "The Cure"
   }
 }
