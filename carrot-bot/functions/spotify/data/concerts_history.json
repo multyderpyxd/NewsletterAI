@@ -1,9 +1,4 @@
 {
-  "https://www.ticketmaster.es/event/jamiroquai-iconica-santalucia-sevilla-fest-tickets/2034594644?language=en-us": {
-    "first_shown": "2026-05-21",
-    "event_date": "2026-07-16",
-    "artist": "Jamiroquai"
-  },
   "https://www.ticketmaster.at/event/strawberry-guy-give-me-a-dream-tour-2026-tickets/1974032825?language=en-us": {
     "first_shown": "2026-06-01",
     "event_date": "2026-10-07",
@@ -74,11 +69,6 @@
     "event_date": "2026-08-23",
     "artist": "Wisp"
   },
-  "https://www.ticketmaster.co.uk/loathe-liverpool-17-07-2026/event/350064B6F8DF709A": {
-    "first_shown": "2026-07-06",
-    "event_date": "2026-07-17",
-    "artist": "Loathe"
-  },
   "https://www.ticketmaster.dk/event/o-days-2026-3-days-ticket-tickets/1991208375?language=en-us": {
     "first_shown": "2026-07-06",
     "event_date": "2026-07-30",
@@ -98,5 +88,10 @@
     "first_shown": "2026-07-13",
     "event_date": "2026-08-21",
     "artist": "The Cure"
+  },
+  "https://www.ticketmaster.co.uk/spiritbox-glasgow-12-09-2026/event/36006452AB126F72": {
+    "first_shown": "2026-07-20",
+    "event_date": "2026-09-12",
+    "artist": "Spiritbox"
   }
 }
