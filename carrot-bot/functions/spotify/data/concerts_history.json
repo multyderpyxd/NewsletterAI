@@ -69,16 +69,6 @@
     "event_date": "2026-08-23",
     "artist": "Wisp"
   },
-  "https://www.ticketmaster.dk/event/o-days-2026-3-days-ticket-tickets/1991208375?language=en-us": {
-    "first_shown": "2026-07-06",
-    "event_date": "2026-07-30",
-    "artist": "PinkPantheress"
-  },
-  "https://www.ticketmaster.dk/event/o-days-2026-thursday--friday-2-day-ticket-tickets/1200120023?language=en-us": {
-    "first_shown": "2026-07-06",
-    "event_date": "2026-07-31",
-    "artist": "PinkPantheress"
-  },
   "https://www.ticketmaster.se/event/way-out-west-august-13-15-2026-tickets/1854460538?language=en-us": {
     "first_shown": "2026-07-13",
     "event_date": "2026-08-15",
@@ -98,5 +88,30 @@
     "first_shown": "2026-07-27",
     "event_date": "2026-09-14",
     "artist": "Spiritbox"
+  },
+  "https://www.ticketmaster.be/event/evanescence-tickets/470433536": {
+    "first_shown": "2026-08-03",
+    "event_date": "2026-09-16",
+    "artist": "Evanescence"
+  },
+  "https://www.ticketmaster.nl/event/evanescence-%7C-venue-premium-packages-tickets/69543769?language=en-us": {
+    "first_shown": "2026-08-03",
+    "event_date": "2026-09-22",
+    "artist": "Evanescence"
+  },
+  "https://www.ticketmaster.nl/event/spiritbox-tsunami-sea-uk--eu-tour-2026-tickets/841934246?language=en-us": {
+    "first_shown": "2026-08-03",
+    "event_date": "2026-10-03",
+    "artist": "Spiritbox"
+  },
+  "https://www.ticketmaster.co.uk/tesseract-manchester-30-10-2026/event/1F0064D9EEBA1A1A": {
+    "first_shown": "2026-08-03",
+    "event_date": "2026-10-30",
+    "artist": "TesseracT"
+  },
+  "https://www.ticketmaster.co.uk/tesseract-the-descent-london-01-11-2026/event/3E0064D9DA839AF1": {
+    "first_shown": "2026-08-03",
+    "event_date": "2026-11-01",
+    "artist": "TesseracT"
   }
 }
