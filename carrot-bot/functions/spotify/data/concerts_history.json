@@ -14,11 +14,6 @@
     "event_date": "2026-11-02",
     "artist": "Tokyo Tea Room"
   },
-  "https://www.universe.com/events/strawberry-guy-tickets-D5YBHN?ref=ticketmaster": {
-    "first_shown": "2026-06-01",
-    "event_date": "2026-09-20",
-    "artist": "Strawberry Guy"
-  },
   "https://www.ticketmaster.co.uk/wage-war-cardiff-15-01-2027/event/1F0064B4DDF66A25": {
     "first_shown": "2026-06-01",
     "event_date": "2027-01-15",
@@ -39,11 +34,6 @@
     "event_date": "2026-11-09",
     "artist": "Architects"
   },
-  "https://www.ticketmaster.co.uk/i-prevail-the-violent-nature-tour-glasgow-20-09-2026/event/3E00633DACEE4134": {
-    "first_shown": "2026-06-22",
-    "event_date": "2026-09-20",
-    "artist": "Amira Elfeky"
-  },
   "https://www.ticketmaster.co.uk/i-prevail-london-25-09-2026/event/1F00634139C7C441": {
     "first_shown": "2026-06-22",
     "event_date": "2026-09-25",
@@ -58,16 +48,6 @@
     "first_shown": "2026-06-22",
     "event_date": "2026-10-02",
     "artist": "Daedric"
-  },
-  "https://www.ticketmaster.co.uk/spiritbox-nottingham-14-09-2026/event/35006452CFB1660F": {
-    "first_shown": "2026-07-27",
-    "event_date": "2026-09-14",
-    "artist": "Spiritbox"
-  },
-  "https://www.ticketmaster.be/event/evanescence-tickets/470433536": {
-    "first_shown": "2026-08-03",
-    "event_date": "2026-09-16",
-    "artist": "Evanescence"
   },
   "https://www.ticketmaster.nl/event/evanescence-%7C-venue-premium-packages-tickets/69543769?language=en-us": {
     "first_shown": "2026-08-03",
@@ -113,5 +93,25 @@
     "first_shown": "2026-09-14",
     "event_date": "2026-09-22",
     "artist": "Evanescence"
+  },
+  "https://www.ticketmaster.es/event/the-warning-everythings-falling-world-tour-tickets/664115608?language=en-us": {
+    "first_shown": "2026-09-21",
+    "event_date": "2027-03-09",
+    "artist": "The Warning"
+  },
+  "https://www.ticketmaster.es/event/the-warning-everythings-falling-world-tour-tickets/1301141988?language=en-us": {
+    "first_shown": "2026-09-21",
+    "event_date": "2027-03-10",
+    "artist": "The Warning"
+  },
+  "https://www.ticketmaster.de/event/violent-vira-tickets/11166472?language=en-us": {
+    "first_shown": "2026-09-21",
+    "event_date": "2026-11-17",
+    "artist": "VIOLENT VIRA"
+  },
+  "https://www.ticketmaster.de/event/violent-vira-tickets/2035899359?language=en-us": {
+    "first_shown": "2026-09-21",
+    "event_date": "2026-11-19",
+    "artist": "VIOLENT VIRA"
   }
 }
