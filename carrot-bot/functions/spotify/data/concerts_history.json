@@ -34,11 +34,6 @@
     "event_date": "2026-11-09",
     "artist": "Architects"
   },
-  "https://www.ticketmaster.co.uk/i-prevail-london-25-09-2026/event/1F00634139C7C441": {
-    "first_shown": "2026-06-22",
-    "event_date": "2026-09-25",
-    "artist": "Amira Elfeky"
-  },
   "https://www.ticketweb.uk/event/unprocessed-manchester-academy-3-tickets/14753523?REFERRAL_ID=tmfeed": {
     "first_shown": "2026-06-22",
     "event_date": "2026-10-01",
@@ -48,11 +43,6 @@
     "first_shown": "2026-06-22",
     "event_date": "2026-10-02",
     "artist": "Daedric"
-  },
-  "https://www.ticketmaster.nl/event/evanescence-%7C-venue-premium-packages-tickets/69543769?language=en-us": {
-    "first_shown": "2026-08-03",
-    "event_date": "2026-09-22",
-    "artist": "Evanescence"
   },
   "https://www.ticketmaster.nl/event/spiritbox-tsunami-sea-uk--eu-tour-2026-tickets/841934246?language=en-us": {
     "first_shown": "2026-08-03",
@@ -74,26 +64,6 @@
     "event_date": "2026-10-08",
     "artist": "Spiritbox"
   },
-  "https://www.ticketmaster.co.uk/i-prevail-the-violent-nature-tour-birmingham-26-09-2026/event/3E00633D16337714": {
-    "first_shown": "2026-08-31",
-    "event_date": "2026-09-26",
-    "artist": "Amira Elfeky"
-  },
-  "https://www.ticketmaster.de/event/evanescence-%7C-box-seat-in-the-ticketmaster-suite-tickets/1125221413?language=en-us": {
-    "first_shown": "2026-09-07",
-    "event_date": "2026-09-23",
-    "artist": "Evanescence"
-  },
-  "https://www.ticketmaster.co.uk/i-prevail-the-violent-nature-tour-birmingham-27-09-2026/event/3E00637B08D3D903": {
-    "first_shown": "2026-09-07",
-    "event_date": "2026-09-27",
-    "artist": "Amira Elfeky"
-  },
-  "https://www.ticketmaster.nl/event/evanescence-%7C-venue-premium-packages-tickets/181632655?language=en-us": {
-    "first_shown": "2026-09-14",
-    "event_date": "2026-09-22",
-    "artist": "Evanescence"
-  },
   "https://www.ticketmaster.es/event/the-warning-everythings-falling-world-tour-tickets/664115608?language=en-us": {
     "first_shown": "2026-09-21",
     "event_date": "2027-03-09",
@@ -113,5 +83,25 @@
     "first_shown": "2026-09-21",
     "event_date": "2026-11-19",
     "artist": "VIOLENT VIRA"
+  },
+  "https://www.ticketmaster.ch/event/i-prevail--the-violent-nature-tour-uk--europe-2026-tickets/296536480?language=en-us": {
+    "first_shown": "2026-09-28",
+    "event_date": "2026-10-08",
+    "artist": "Gore."
+  },
+  "https://www.ticketmaster.de/event/violent-vira-tickets/1382785213?language=en-us": {
+    "first_shown": "2026-09-28",
+    "event_date": "2026-11-18",
+    "artist": "VIOLENT VIRA"
+  },
+  "https://www.ticketmaster.pl/event/i-prevail-the-violent-nature-tour-uk--europe-2026-warsaw-tickets/663013665?language=en-us": {
+    "first_shown": "2026-09-28",
+    "event_date": "2026-10-12",
+    "artist": "Gore."
+  },
+  "https://www.ticketmaster.ie/hail-the-sun-belfast-03-11-2026/event/380064EFD0981330": {
+    "first_shown": "2026-09-28",
+    "event_date": "2026-11-03",
+    "artist": "Hail The Sun"
   }
 }
