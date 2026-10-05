@@ -34,21 +34,6 @@
     "event_date": "2026-11-09",
     "artist": "Architects"
   },
-  "https://www.ticketweb.uk/event/unprocessed-manchester-academy-3-tickets/14753523?REFERRAL_ID=tmfeed": {
-    "first_shown": "2026-06-22",
-    "event_date": "2026-10-01",
-    "artist": "Daedric"
-  },
-  "https://www.ticketweb.uk/event/unprocessed-electric-ballroom-tickets/14753533?REFERRAL_ID=tmfeed": {
-    "first_shown": "2026-06-22",
-    "event_date": "2026-10-02",
-    "artist": "Daedric"
-  },
-  "https://www.ticketmaster.nl/event/spiritbox-tsunami-sea-uk--eu-tour-2026-tickets/841934246?language=en-us": {
-    "first_shown": "2026-08-03",
-    "event_date": "2026-10-03",
-    "artist": "Spiritbox"
-  },
   "https://www.ticketmaster.co.uk/tesseract-manchester-30-10-2026/event/1F0064D9EEBA1A1A": {
     "first_shown": "2026-08-03",
     "event_date": "2026-10-30",
@@ -102,6 +87,11 @@
   "https://www.ticketmaster.ie/hail-the-sun-belfast-03-11-2026/event/380064EFD0981330": {
     "first_shown": "2026-09-28",
     "event_date": "2026-11-03",
+    "artist": "Hail The Sun"
+  },
+  "https://www.ticketmaster.ie/hail-the-sun-dublin-04-11-2026/event/180064F4C677E007": {
+    "first_shown": "2026-10-05",
+    "event_date": "2026-11-04",
     "artist": "Hail The Sun"
   }
 }
