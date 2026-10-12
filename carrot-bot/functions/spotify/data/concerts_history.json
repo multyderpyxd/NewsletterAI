@@ -1,9 +1,4 @@
 {
-  "https://www.ticketmaster.at/event/strawberry-guy-give-me-a-dream-tour-2026-tickets/1974032825?language=en-us": {
-    "first_shown": "2026-06-01",
-    "event_date": "2026-10-07",
-    "artist": "Strawberry Guy"
-  },
   "https://www.ticketmaster.de/event/tokyo-tea-room-tickets/913462331?language=en-us": {
     "first_shown": "2026-06-01",
     "event_date": "2026-11-01",
@@ -44,11 +39,6 @@
     "event_date": "2026-11-01",
     "artist": "TesseracT"
   },
-  "https://www.ticketmaster.be/event/spiritbox-tsunami-sea-uk--eu-tour-2026-tickets/513257290": {
-    "first_shown": "2026-08-10",
-    "event_date": "2026-10-08",
-    "artist": "Spiritbox"
-  },
   "https://www.ticketmaster.es/event/the-warning-everythings-falling-world-tour-tickets/664115608?language=en-us": {
     "first_shown": "2026-09-21",
     "event_date": "2027-03-09",
@@ -69,11 +59,6 @@
     "event_date": "2026-11-19",
     "artist": "VIOLENT VIRA"
   },
-  "https://www.ticketmaster.ch/event/i-prevail--the-violent-nature-tour-uk--europe-2026-tickets/296536480?language=en-us": {
-    "first_shown": "2026-09-28",
-    "event_date": "2026-10-08",
-    "artist": "Gore."
-  },
   "https://www.ticketmaster.de/event/violent-vira-tickets/1382785213?language=en-us": {
     "first_shown": "2026-09-28",
     "event_date": "2026-11-18",
@@ -93,5 +78,35 @@
     "first_shown": "2026-10-05",
     "event_date": "2026-11-04",
     "artist": "Hail The Sun"
+  },
+  "https://www.ticketmaster.nl/event/basement-tickets/539447071?language=en-us": {
+    "first_shown": "2026-10-12",
+    "event_date": "2027-02-02",
+    "artist": "Fleshwater"
+  },
+  "https://www.ticketmaster.be/event/hayley-williams-%7C-beat-premium-bistronomy-experience-tickets/1670290345": {
+    "first_shown": "2026-10-12",
+    "event_date": "2027-06-14",
+    "artist": "Hayley Williams"
+  },
+  "https://www.ticketmaster.nl/event/hayley-williams-%7C-premium-seats-tickets/1862823506?language=en-us": {
+    "first_shown": "2026-10-12",
+    "event_date": "2027-06-17",
+    "artist": "Hayley Williams"
+  },
+  "https://www.ticketmaster.pl/event/wilt-tickets/1857695451?language=en-us": {
+    "first_shown": "2026-10-12",
+    "event_date": "2026-11-14",
+    "artist": "wilt"
+  },
+  "https://www.ticketmaster.co.uk/wilt-manchester-24-11-2026/event/1F0064B5998C2E52": {
+    "first_shown": "2026-10-12",
+    "event_date": "2026-11-24",
+    "artist": "wilt"
+  },
+  "https://www.ticketmaster.co.uk/basement-birmingham-13-02-2027/event/3E006514E6753246": {
+    "first_shown": "2026-10-12",
+    "event_date": "2027-02-13",
+    "artist": "Fleshwater"
   }
 }
