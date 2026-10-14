@@ -1,6 +1,6 @@
 # NewsletterAI — CarrotBot 🥕
 
-CarrotBot es un bot de newsletter musical personalizado. Cada semana agrega datos de múltiples fuentes (Ticketmaster, Last.fm, Spotify, RSS y scrapers de salas locales), los procesa con un modelo de lenguaje (GPT-4.1) y envía un email HTML con cuatro bloques: conciertos, lanzamientos, descubrimientos y agenda local en Zaragoza.
+CarrotBot es un bot de newsletter musical personalizado. Cada semana agrega datos de múltiples fuentes (Ticketmaster, Last.fm, Spotify, RSS y scrapers de salas locales), los procesa con un modelo de lenguaje (GPT-6.1 Sol) y envía un email HTML con cuatro bloques: conciertos, lanzamientos, descubrimientos y agenda local en Zaragoza.
 
 ---
 
@@ -95,7 +95,7 @@ El `aggregator.py` ejecuta en orden:
 5. **Last.fm + Spotify** — lanzamientos recientes y artistas similares/relacionados.
 
 ### Paso 3 — Procesamiento con IA
-Se construye un prompt estructurado con todos los datos y se envía a GPT-4.1-mini. El modelo devuelve un JSON con cuatro bloques: `concerts`, `releases`, `discoveries` y `local_candidates`.
+Se construye un prompt estructurado con todos los datos y se envía al modelo configurado en `OPENAI_MODEL` (actualmente `gpt-6.1-sol`). El modelo devuelve un JSON con cuatro bloques: `concerts`, `releases`, `discoveries` y `local_candidates`.
 
 El sistema aplica reglas adicionales en código (no depende de la IA para):
 - Separar conciertos de Ticketmaster en nuevos (`[A-NEW]`) y ya reportados (`[A-PREV]`).
@@ -225,7 +225,7 @@ El proyecto carga un fichero `.env` desde `carrot-bot/functions/.env`.
 | Variable | Descripción |
 |---|---|
 | `OPENAI_API_KEY` | Clave de OpenAI para el procesamiento con IA |
-| `OPENAI_MODEL` | Modelo a usar (por defecto: `gpt-4.1`) |
+| `OPENAI_MODEL` | Modelo a usar (por defecto: `gpt-6.1-sol`) |
 | `LASTFM_API_KEY` | Clave de la API de Last.fm |
 | `SPOTIFY_CLIENT_ID` | Client ID de la app de Spotify |
 | `SPOTIFY_CLIENT_SECRET` | Client Secret de la app de Spotify |

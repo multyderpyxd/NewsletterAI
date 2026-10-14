@@ -34,7 +34,7 @@ jobs:
       # persisten haciendo commit al repo al final de cada ejecución.
 
       # ── Configuración variables
-      OPENAI_MODEL:                      gpt-4.1
+      OPENAI_MODEL:                      gpt-6.1-sol
       CARROTBOT_RELEASE_LOOKBACK_DAYS:   180
       CARROTBOT_RELEASE_LOOKAHEAD_DAYS:  365
       SPOTIFY_CACHE_TTL_HOURS:           12

@@ -16,7 +16,7 @@ import re
 from datetime import datetime, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import BadRequestError, OpenAI
 
 load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 
@@ -435,17 +435,30 @@ Reglas ESTRICTAS:
 
 def call_ai(prompt: str) -> dict:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    model  = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+    model  = os.getenv("OPENAI_MODEL", "gpt-6.1-sol")
 
-    response = client.chat.completions.create(
+    # max_completion_tokens sustituye a max_tokens (los modelos nuevos rechazan
+    # este último) y en modelos de razonamiento incluye los tokens de
+    # razonamiento, por eso el margen es amplio.
+    params = dict(
         model=model,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user",   "content": prompt},
         ],
         temperature=0.2,
-        max_tokens=5000,
+        max_completion_tokens=16000,
     )
+
+    try:
+        response = client.chat.completions.create(**params)
+    except BadRequestError as e:
+        # Algunos modelos solo aceptan la temperature por defecto
+        if "temperature" not in str(e):
+            raise
+        print(f"  ℹ️  {model} no admite temperature personalizada; reintentando sin ella.")
+        params.pop("temperature")
+        response = client.chat.completions.create(**params)
 
     choice        = response.choices[0]
     finish_reason = choice.finish_reason
@@ -453,8 +466,8 @@ def call_ai(prompt: str) -> dict:
 
     if finish_reason == "length":
         used = response.usage.completion_tokens if response.usage else "?"
-        print(f"  ⚠️  Respuesta cortada por max_tokens (completion_tokens={used}). "
-              f"Aumenta max_tokens en call_ai().")
+        print(f"  ⚠️  Respuesta cortada por max_completion_tokens (completion_tokens={used}). "
+              f"Aumenta max_completion_tokens en call_ai().")
 
     result = _safe_json(raw)
     return _normalize(result)
