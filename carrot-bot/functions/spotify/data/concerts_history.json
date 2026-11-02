@@ -1,9 +1,4 @@
 {
-  "https://www.ticketmaster.de/event/tokyo-tea-room-tickets/913462331?language=en-us": {
-    "first_shown": "2026-06-01",
-    "event_date": "2026-11-01",
-    "artist": "Tokyo Tea Room"
-  },
   "https://www.ticketmaster.de/event/tokyo-tea-room-tickets/1856875389?language=en-us": {
     "first_shown": "2026-06-01",
     "event_date": "2026-11-02",
@@ -28,16 +23,6 @@
     "first_shown": "2026-06-22",
     "event_date": "2026-11-09",
     "artist": "Architects"
-  },
-  "https://www.ticketmaster.co.uk/tesseract-manchester-30-10-2026/event/1F0064D9EEBA1A1A": {
-    "first_shown": "2026-08-03",
-    "event_date": "2026-10-30",
-    "artist": "TesseracT"
-  },
-  "https://www.ticketmaster.co.uk/tesseract-the-descent-london-01-11-2026/event/3E0064D9DA839AF1": {
-    "first_shown": "2026-08-03",
-    "event_date": "2026-11-01",
-    "artist": "TesseracT"
   },
   "https://www.ticketmaster.es/event/the-warning-everythings-falling-world-tour-tickets/664115608?language=en-us": {
     "first_shown": "2026-09-21",
@@ -103,5 +88,15 @@
     "first_shown": "2026-10-12",
     "event_date": "2027-02-13",
     "artist": "Fleshwater"
+  },
+  "https://www.universe.com/events/wage-war-tickets-4TL7JY?ref=ticketmaster": {
+    "first_shown": "2026-11-02",
+    "event_date": "2027-01-15",
+    "artist": "Invent Animate"
+  },
+  "https://www.universe.com/events/oktobernatt-tickets-495Q7Y?ref=ticketmaster": {
+    "first_shown": "2026-11-02",
+    "event_date": "2027-02-18",
+    "artist": "oktobernatt"
   }
 }
